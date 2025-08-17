@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using InventoryManagement.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace InventoryManagement.Infrastructure
 {
@@ -9,6 +11,15 @@ namespace InventoryManagement.Infrastructure
         {
         }
 
-        // We will add DbSet properties for our entities here in future milestones.
+        public DbSet<User> Users { get; set; }
+        public DbSet<Role> Roles { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            // This line scans the assembly for all configurations that implement IEntityTypeConfiguration
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        }
     }
 }
