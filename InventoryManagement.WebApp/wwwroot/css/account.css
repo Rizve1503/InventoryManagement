@@ -1,0 +1,152 @@
+﻿body {
+    background-color: #f4f7fc;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.account-container {
+    display: flex;
+    min-height: 100vh;
+    width: 100%;
+}
+
+/* === Left Branding Panel === */
+.branding-panel {
+    width: 45%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    /* Apply the background image */
+    background-image: url('../images/background.jpg');
+    background-size: cover;
+    background-position: center;
+    /* Create the diagonal cut effect */
+    clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
+}
+
+.branding-content {
+    max-width: 400px;
+    padding: 2rem;
+}
+
+.branding-logo-img {
+    max-width: 100%;
+    height: auto;
+}
+
+
+/* === Right Form Panel === */
+.form-panel {
+    width: 55%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: #f4f7fc;
+}
+
+.account-card {
+    width: 100%;
+    max-width: 450px;
+    background-color: white;
+    padding: 3rem;
+    border-radius: 16px;
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+}
+
+    .account-card h1 {
+        font-size: 2.25rem;
+        font-weight: 600;
+        margin-bottom: 2.5rem;
+        text-align: center;
+    }
+
+
+/* === Form Styles === */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: #334155;
+    }
+
+.form-control {
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    border: 1px solid #cbd5e1;
+    font-size: 1rem;
+}
+
+    .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+    }
+
+.btn-primary {
+    width: 100%;
+    padding: 0.9rem;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    background-color: #3b82f6;
+    border-color: #3b82f6;
+    transition: background-color 0.2s ease;
+}
+
+    .btn-primary:hover {
+        background-color: #2563eb;
+        border-color: #2563eb;
+    }
+
+.account-links {
+    text-align: center;
+    margin-top: 1.5rem;
+}
+
+    .account-links a {
+        color: #3b82f6;
+        text-decoration: none;
+    }
+
+        .account-links a:hover {
+            text-decoration: underline;
+        }
+
+
+/* === RESPONSIVENESS === */
+@media (max-width: 992px) {
+    .account-container {
+        flex-direction: column;
+    }
+
+    .branding-panel {
+        width: 100%;
+        min-height: 250px;
+        /* Remove the diagonal cut on smaller screens for a clean, stacked look */
+        clip-path: none;
+    }
+
+    .form-panel {
+        width: 100%;
+        padding: 2rem 1rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .account-card {
+        padding: 2rem 1.5rem;
+        box-shadow: none;
+        border-radius: 0;
+    }
+
+        .account-card h1 {
+            font-size: 2rem;
+        }
+}

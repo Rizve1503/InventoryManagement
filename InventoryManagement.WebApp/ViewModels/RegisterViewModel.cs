@@ -5,6 +5,10 @@ namespace InventoryManagement.WebApp.ViewModels
     public class RegisterViewModel
     {
         [Required]
+        [StringLength(50, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 2)]
+        public string Name { get; set; } = string.Empty; // Add this property
+
+        [Required]
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
 

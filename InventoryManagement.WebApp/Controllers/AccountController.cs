@@ -39,12 +39,20 @@ namespace InventoryManagement.WebApp.Controllers
 
                 if (user != null && _passwordService.VerifyPassword(model.Password, user.PasswordHash))
                 {
+                    // === THIS IS THE SECTION TO CHANGE ===
                     var claims = new List<Claim>
                     {
-                        new Claim(ClaimTypes.Name, user.Email),
+                        // Change ClaimTypes.Name to use user.Name
+                        new Claim(ClaimTypes.Name, user.Name), 
+                        
+                        // Add the email as a separate claim for other potential uses
+                        new Claim(ClaimTypes.Email, user.Email), 
+
+                        // These claims remain the same
                         new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                         new Claim(ClaimTypes.Role, user.Role?.Name ?? "User")
                     };
+                    // === END OF SECTION TO CHANGE ===
 
                     var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
 
@@ -97,6 +105,7 @@ namespace InventoryManagement.WebApp.Controllers
 
                 var user = new User
                 {
+                    Name = model.Name,
                     Email = model.Email,
                     PasswordHash = _passwordService.HashPassword(model.Password),
                     RoleId = userRole.Id

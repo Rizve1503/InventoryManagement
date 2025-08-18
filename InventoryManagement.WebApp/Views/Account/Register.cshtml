@@ -1,35 +1,51 @@
 ﻿@model InventoryManagement.WebApp.ViewModels.RegisterViewModel
+
 @{
-    ViewData["Title"] = "Register";
+    Layout = "~/Views/Shared/_LayoutAccount.cshtml";
+    ViewData["Title"] = "Create Account";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="account-card">
+    <h1>Create Account</h1>
+    <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
 
-<div class="row">
-    <div class="col-md-4">
-        <form asp-route-returnUrl="@ViewData["ReturnUrl"]" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-floating mb-3">
-                <input asp-for="Email" class="form-control" />
-                <label asp-for="Email"></label>
-                <span asp-validation-for="Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Password" class="form-control" />
-                <label asp-for="Password"></label>
-                <span asp-validation-for="Password" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="ConfirmPassword" class="form-control" />
-                <label asp-for="ConfirmPassword"></label>
-                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-            </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
-    </div>
+        <div class="form-group">
+            <label asp-for="Name"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Email"></label>
+            <input asp-for="Email" class="form-control" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="Password"></label>
+            <input asp-for="Password" class="form-control" />
+            <span asp-validation-for="Password" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="ConfirmPassword"></label>
+            <input asp-for="ConfirmPassword" class="form-control" />
+            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Create Account</button>
+        </div>
+
+        <div class="account-links">
+            <p>
+                Already have an account? <a asp-action="Login">Sign In</a>
+            </p>
+        </div>
+    </form>
 </div>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
