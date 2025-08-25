@@ -9,5 +9,7 @@
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public int RoleId { get; set; }
         public virtual Role? Role { get; set; }
+        public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
+
     }
 }
