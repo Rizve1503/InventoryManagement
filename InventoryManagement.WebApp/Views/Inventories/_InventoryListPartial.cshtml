@@ -1,0 +1,24 @@
+﻿@model IEnumerable<InventoryManagement.Domain.Entities.Inventory>
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>@Html.DisplayFor(modelItem => item.Title)</td>
+        <td>@(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</td>
+        <td>
+            @if (item.IsPublic)
+            {
+                <span class="badge bg-success">Public</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Private</span>
+            }
+        </td>
+        <td>@item.Items.Count</td>
+        <td>@item.CreatedAt.ToShortDateString()</td>
+        <td>
+            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+        </td>
+    </tr>
+}

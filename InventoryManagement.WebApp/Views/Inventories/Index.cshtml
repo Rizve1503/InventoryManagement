@@ -1,0 +1,83 @@
+﻿@model IEnumerable<InventoryManagement.Domain.Entities.Inventory>
+
+@{
+    ViewData["Title"] = "My Inventories";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@ViewData["Title"]</h1>
+    <a asp-action="Create" class="btn btn-primary">Create New Inventory</a>
+</div>
+
+@if (!Model.Any())
+{
+    <div class="text-center">
+        <p>You haven't created any inventories yet.</p>
+    </div>
+}
+else
+{
+    <table class="table table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>Title</th>
+                <th>Description</th>
+                <th>Status</th>
+                <th>Items</th>
+                <th>Created</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody id="inventory-table-body">
+            <partial name="_InventoryListPartial" model="Model" />
+        </tbody>
+    </table>
+
+    @if (ViewBag.HasMoreInventories == true)
+    {
+        <div id="loading-indicator" class="text-center my-4" style="display: none;">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+}
+
+@section Scripts {
+    @if (ViewBag.HasMoreInventories == true)
+    {
+        <script>
+            $(document).ready(function () {
+                let page = 2;
+                let isLoading = false;
+                let hasMore = true;
+
+                $(window).scroll(function () {
+                    // Check if we are near the bottom of the page, not currently loading, and there's more data to fetch
+                    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200 && !isLoading && hasMore) {
+                        isLoading = true;
+                        $('#loading-indicator').show();
+
+                        $.get('/Inventories/GetInventoriesPage?page=' + page, function (data) {
+                            if (data.trim().length > 0) {
+                                $('#inventory-table-body').append(data);
+                                page++;
+                                isLoading = false;
+                                $('#loading-indicator').hide();
+                            } else {
+                                // No more data to load
+                                hasMore = false;
+                                $('#loading-indicator').hide();
+                            }
+                        }).fail(function() {
+                            // Handle potential errors, e.g., stop trying to load more
+                            hasMore = false;
+                            isLoading = false;
+                            $('#loading-indicator').hide();
+                        });
+                    }
+                });
+            });
+        </script>
+    }
+}
