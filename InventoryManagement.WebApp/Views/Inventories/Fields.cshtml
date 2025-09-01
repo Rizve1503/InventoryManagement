@@ -1,0 +1,52 @@
+﻿@model InventoryManagement.WebApp.ViewModels.CustomFieldsViewModel
+
+@{
+    ViewData["Title"] = "Custom Fields";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-action="Index">My Inventories</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.InventoryTitle</li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"] for "@Model.InventoryTitle"</h1>
+<p class="text-muted">Define the data fields for items in this inventory. Enable a field and give it a name.</p>
+<hr />
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<form asp-action="Fields" asp-route-id="@Model.InventoryId" method="post">
+    @Html.HiddenFor(m => m.InventoryId)
+    @Html.HiddenFor(m => m.RowVersion)
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    <div class="row">
+        <!-- Single-Line Text Fields -->
+        <div class="col-md-4">
+            <h5><i class="bi bi-fonts"></i> Single-Line Text</h5>
+            @for (int i = 1; i <= 3; i++)
+            {
+                <div class="card mb-3 p-3">
+                    <div class="form-check form-switch mb-2">
+                        <input class="form-check-input" type="checkbox" name="CustomString@(i)State" id="CustomString@(i)State" value="true" @(Model.GetType().GetProperty($"CustomString{i}State").GetValue(Model).ToString().ToLower() == "true" ? "checked" : "")>
+                        <label class="form-check-label" for="CustomString@(i)State">Enable Field</label>
+                    </div>
+                    <input type="text" name="CustomString@(i)Name" class="form-control" placeholder="Field Name (e.g., 'Model')" value="@Model.GetType().GetProperty($"CustomString{i}Name").GetValue(Model)">
+                </div>
+            }
+        </div>
+        <!-- ... Repeat for Multi-Line, Numeric, Boolean, and Link fields using the same pattern ... -->
+    </div>
+
+    <div class="form-group mt-4">
+        <button type="submit" class="btn btn-primary">Save Fields</button>
+        <a asp-action="Index" class="btn btn-secondary">Back to Inventories</a>
+    </div>
+</form>

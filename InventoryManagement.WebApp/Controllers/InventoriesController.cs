@@ -188,5 +188,75 @@ namespace InventoryManagement.WebApp.Controllers
             }
             throw new InvalidOperationException("User ID is not available in the claims.");
         }
+
+
+        // GET: /Inventories/Fields/5
+        [HttpGet]
+        public async Task<IActionResult> Fields(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var inventory = await _context.Inventories.FindAsync(id);
+            if (inventory == null) return NotFound();
+
+            // Authorization Check
+            if (inventory.CreatorId != GetCurrentUserId()) return Forbid();
+
+            var model = new CustomFieldsViewModel
+            {
+                InventoryId = inventory.Id,
+                InventoryTitle = inventory.Title,
+                RowVersion = inventory.RowVersion,
+                // Map all 15 field states and names from entity to viewmodel
+                CustomString1State = inventory.CustomString1State,
+                CustomString1Name = inventory.CustomString1Name,
+                // ... (repeat for all other custom fields) ...
+                CustomLink3State = inventory.CustomLink3State,
+                CustomLink3Name = inventory.CustomLink3Name
+            };
+
+            return View(model);
+        }
+
+        // POST: /Inventories/Fields/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Fields(int id, CustomFieldsViewModel model)
+        {
+            if (id != model.InventoryId) return NotFound();
+
+            if (!ModelState.IsValid) return View(model);
+
+            var inventoryToUpdate = await _context.Inventories.FindAsync(id);
+            if (inventoryToUpdate == null) return NotFound();
+
+            // Authorization Check
+            if (inventoryToUpdate.CreatorId != GetCurrentUserId()) return Forbid();
+
+            _context.Entry(inventoryToUpdate).Property("RowVersion").OriginalValue = model.RowVersion;
+
+            // Map all 15 field states and names from viewmodel back to entity
+            inventoryToUpdate.CustomString1State = model.CustomString1State;
+            inventoryToUpdate.CustomString1Name = model.CustomString1State ? model.CustomString1Name : string.Empty;
+            // ... (repeat for all other custom fields, ensuring Name is cleared if State is false) ...
+            inventoryToUpdate.CustomLink3State = model.CustomLink3State;
+            inventoryToUpdate.CustomLink3Name = model.CustomLink3State ? model.CustomLink3Name : string.Empty;
+
+            inventoryToUpdate.UpdatedAt = DateTime.UtcNow;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                // Add a success message to TempData
+                TempData["SuccessMessage"] = "Custom fields saved successfully!";
+                return RedirectToAction(nameof(Fields), new { id = model.InventoryId });
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                // Handle concurrency error similar to the Edit action
+                ModelState.AddModelError(string.Empty, "These settings were modified by another user. Please reload and try again.");
+                return View(model);
+            }
+        }
     }
 }

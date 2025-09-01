@@ -1,0 +1,52 @@
+﻿@using InventoryManagement.WebApp.ViewModels
+@model ItemViewModel
+
+@{
+    ViewData["Title"] = $"Add New Item to {Model.Inventory?.Title}";
+}
+
+<h1>@ViewData["Title"]</h1>
+<hr />
+
+<form asp-action="Create" method="post">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="InventoryId" />
+
+    <div class="row">
+        <div class="col-md-8">
+            @{
+                // Helper function to render a form group
+                void RenderFormInput(string stateProperty, string nameProperty, string valueProperty, string inputType = "text")
+                {
+                    var state = (bool)(Model.Inventory?.GetType().GetProperty(stateProperty)?.GetValue(Model.Inventory) ?? false);
+                    if (state)
+                    {
+                        var name = (string)(Model.Inventory?.GetType().GetProperty(nameProperty)?.GetValue(Model.Inventory) ?? "");
+                        <div class="mb-3">
+                            <label class="form-label">@name</label>
+                            <input name="Item.@valueProperty" type="@inputType" class="form-control" />
+                        </div>
+                    }
+                }
+            }
+
+            @* Render String fields *@
+            @{ RenderFormInput("CustomString1State", "CustomString1Name", "CustomString1Value"); }
+            @{ RenderFormInput("CustomString2State", "CustomString2Name", "CustomString2Value"); }
+            @{ RenderFormInput("CustomString3State", "CustomString3Name", "CustomString3Value"); }
+
+            @* Render Numeric fields *@
+            @{ RenderFormInput("CustomNumeric1State", "CustomNumeric1Name", "CustomNumeric1Value", "number"); }
+            @{ RenderFormInput("CustomNumeric2State", "CustomNumeric2Name", "CustomNumeric2Value", "number"); }
+            @{ RenderFormInput("CustomNumeric3State", "CustomNumeric3Name", "CustomNumeric3Value", "number"); }
+
+            @* ToDo: Render other field types (Text, Bool, Link) using similar logic *@
+
+        </div>
+    </div>
+
+    <div class="form-group mt-3">
+        <input type="submit" value="Create Item" class="btn btn-primary" />
+        <a asp-action="Index" asp-route-inventoryId="@Model.InventoryId" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>

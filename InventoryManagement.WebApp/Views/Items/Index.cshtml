@@ -1,0 +1,86 @@
+﻿@using InventoryManagement.WebApp.ViewModels
+@model ItemIndexViewModel
+
+@{
+    ViewData["Title"] = $"Items in {Model.Inventory.Title}";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Inventories" asp-action="Index">My Inventories</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.Inventory.Title</li>
+    </ol>
+</nav>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>@ViewData["Title"]</h1>
+    <a asp-action="Create" asp-route-inventoryId="@Model.Inventory.Id" class="btn btn-primary">Add New Item</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="thead-light">
+        <tr>
+            @if (Model.Inventory.CustomString1State)
+            {
+                <th>@Model.Inventory.CustomString1Name</th>
+            }
+            @if (Model.Inventory.CustomString2State)
+            {
+                <th>@Model.Inventory.CustomString2Name</th>
+            }
+            @if (Model.Inventory.CustomString3State)
+            {
+                <th>@Model.Inventory.CustomString3Name</th>
+            }
+            @if (Model.Inventory.CustomNumeric1State)
+            {
+                <th>@Model.Inventory.CustomNumeric1Name</th>
+            }
+            @if (Model.Inventory.CustomNumeric2State)
+            {
+                <th>@Model.Inventory.CustomNumeric2Name</th>
+            }
+            @if (Model.Inventory.CustomNumeric3State)
+            {
+                <th>@Model.Inventory.CustomNumeric3Name</th>
+            }
+            <th>Created</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Items)
+        {
+            <tr>
+                @if (Model.Inventory.CustomString1State)
+                {
+                    <td>@item.CustomString1Value</td>
+                }
+                @if (Model.Inventory.CustomString2State)
+                {
+                    <td>@item.CustomString2Value</td>
+                }
+                @if (Model.Inventory.CustomString3State)
+                {
+                    <td>@item.CustomString3Value</td>
+                }
+                @if (Model.Inventory.CustomNumeric1State)
+                {
+                    <td>@item.CustomNumeric1Value</td>
+                }
+                @if (Model.Inventory.CustomNumeric2State)
+                {
+                    <td>@item.CustomNumeric2Value</td>
+                }
+                @if (Model.Inventory.CustomNumeric3State)
+                {
+                    <td>@item.CustomNumeric3Value</td>
+                }
+                <td>@item.CreatedAt.ToShortDateString()</td>
+                <td>
+                    @* Edit/Delete buttons will go here *@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
