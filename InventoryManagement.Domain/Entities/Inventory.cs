@@ -66,5 +66,7 @@ namespace InventoryManagement.Domain.Entities
         public string CustomLink2Name { get; set; } = string.Empty;
         public bool CustomLink3State { get; set; }
         public string CustomLink3Name { get; set; } = string.Empty;
+        public string? CustomIdFormatJson { get; set; }
+
     }
 }

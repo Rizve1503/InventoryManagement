@@ -1,0 +1,204 @@
+﻿@using InventoryManagement.WebApp.ViewModels
+@model CustomIdViewModel
+
+@{
+    ViewData["Title"] = "Custom ID Format";
+}
+
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-controller="Inventories" asp-action="Index">My Inventories</a></li>
+        <li class="breadcrumb-item active" aria-current="page">@Model.InventoryTitle</li>
+    </ol>
+</nav>
+
+<h1>@ViewData["Title"] for "@Model.InventoryTitle"</h1>
+<p class="text-muted">Drag elements from the Toolbox to the Editor to build your ID format. Reorder them as needed.</p>
+
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="alert alert-success" role="alert">
+        @TempData["SuccessMessage"]
+    </div>
+}
+
+<div class="row mt-4">
+    <!-- Left Column: Toolbox -->
+    <div class="col-md-3">
+        <h5>Toolbox</h5>
+        <div id="toolbox" class="list-group id-element-list">
+            <div class="list-group-item toolbox-item" data-type="FixedText"><i class="bi bi-fonts"></i> Fixed Text</div>
+            <div class="list-group-item toolbox-item" data-type="Sequence"><i class="bi bi-123"></i> Sequence</div>
+            <div class="list-group-item toolbox-item" data-type="RandomString"><i class="bi bi-shuffle"></i> Random String</div>
+            <div class="list-group-item toolbox-item" data-type="DateTime"><i class="bi bi-calendar-event"></i> Date/Time</div>
+        </div>
+        <small class="form-text text-muted mt-2 d-block">Drag an element to the right.</small>
+    </div>
+
+    <!-- Right Column: Editor and Preview -->
+    <div class="col-md-9">
+        <h5>Editor</h5>
+        <form asp-action="CustomId" id="customIdForm" method="post">
+            @Html.HiddenFor(m => m.InventoryId)
+            @Html.HiddenFor(m => m.RowVersion)
+            <input type="hidden" asp-for="IdFormatJson" id="idFormatJsonInput" />
+
+            <div id="editor" class="id-element-list min-vh-25 border p-2 rounded bg-light">
+                <!-- Configured elements will be added here by JS -->
+            </div>
+
+            <h5 class="mt-4">Live Preview</h5>
+            <div class="card">
+                <div class="card-body">
+                    <code id="preview-box" class="fs-4">Example: ...</code>
+                </div>
+            </div>
+
+            <div class="form-group mt-4">
+                <button type="submit" class="btn btn-primary">Save Format</button>
+                <a asp-controller="Inventories" asp-action="Index" class="btn btn-secondary">Back to Inventories</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Styles {
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        .id-element-list { min-height: 100px; }
+        .toolbox-item { cursor: grab; user-select: none; }
+        .editor-item { background-color: white; padding: 10px; border: 1px solid #ddd; margin-bottom: 5px; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; }
+        .editor-item:hover { cursor: grab; }
+        .editor-item-content { flex-grow: 1; }
+        .editor-item .form-control { display: inline-block; width: auto; margin-left: 10px; }
+        .sortable-ghost { opacity: 0.4; background: #c8ebfb; }
+    </style>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const editorEl = document.getElementById('editor');
+            const toolboxEl = document.getElementById('toolbox');
+            const jsonInput = document.getElementById('idFormatJsonInput');
+            const previewBox = document.getElementById('preview-box');
+            const inventoryId = @Model.InventoryId;
+
+            // --- Core Functions ---
+            const serializeConfiguration = () => {
+                const elements = [];
+                editorEl.querySelectorAll('.editor-item').forEach(el => {
+                    const type = el.dataset.type;
+                    let value = '';
+                    let format = '';
+
+                    if (type === 'FixedText') {
+                        value = el.querySelector('input[name="value"]').value;
+                    } else if (type === 'Sequence' || type === 'DateTime' || type === 'RandomString') {
+                        format = el.querySelector('input[name="format"]').value;
+                    }
+                    elements.push({ Type: type, Value: value, Format: format });
+                });
+
+                const config = { Elements: elements };
+                const jsonString = JSON.stringify(config);
+                jsonInput.value = jsonString;
+
+                updatePreview(config);
+            };
+
+            const updatePreview = (config) => {
+                fetch(`/Inventories/GeneratePreviewId?inventoryId=${inventoryId}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(config)
+                })
+                .then(response => response.json())
+                .then(data => {
+                    previewBox.textContent = data.id ? `Example: ${data.id}` : 'Example: ...';
+                })
+                .catch(() => previewBox.textContent = 'Error generating preview.');
+            };
+
+            const createElementUI = (type) => {
+                const item = document.createElement('div');
+                item.className = 'editor-item';
+                item.dataset.type = type;
+
+                let contentHtml = '';
+                switch (type) {
+                    case 'FixedText':
+                        contentHtml = `<i class="bi bi-fonts"></i> Fixed Text: <input type="text" name="value" class="form-control" placeholder="Enter text...">`;
+                        break;
+                    case 'Sequence':
+                        contentHtml = `<i class="bi bi-123"></i> Sequence: <input type="text" name="format" class="form-control" value="D5" placeholder="e.g., D5">`;
+                        break;
+                    case 'RandomString':
+                        contentHtml = `<i class="bi bi-shuffle"></i> Random String: <input type="text" name="format" class="form-control" value="6" placeholder="Length (e.g., 6)">`;
+                        break;
+                    case 'DateTime':
+                        contentHtml = `<i class="bi bi-calendar-event"></i> Date/Time: <input type="text" name="format" class="form-control" value="yyyyMMdd" placeholder="e.g., yyyyMMdd">`;
+                        break;
+                }
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'editor-item-content';
+                contentDiv.innerHTML = contentHtml;
+
+                const removeBtn = document.createElement('button');
+                removeBtn.type = 'button';
+                removeBtn.className = 'btn btn-sm btn-outline-danger ms-3';
+                removeBtn.innerHTML = '<i class="bi bi-trash"></i>';
+                removeBtn.onclick = () => {
+                    item.remove();
+                    serializeConfiguration();
+                };
+
+                item.appendChild(contentDiv);
+                item.appendChild(removeBtn);
+
+                // Add event listeners to inputs to update on change
+                item.querySelectorAll('input').forEach(input => {
+                    input.addEventListener('input', serializeConfiguration);
+                });
+
+                return item;
+            };
+
+            // --- Initialization ---
+            new Sortable(toolboxEl, {
+                group: { name: 'shared', pull: 'clone', put: false },
+                sort: false
+            });
+
+            new Sortable(editorEl, {
+                group: 'shared',
+                animation: 150,
+                onAdd: function (evt) {
+                    const originalEl = evt.item;
+                    const type = originalEl.dataset.type;
+                    const newEl = createElementUI(type);
+                    originalEl.replaceWith(newEl);
+                    serializeConfiguration();
+                },
+                onUpdate: serializeConfiguration // Fired when reordering
+            });
+
+            // --- Load Initial State ---
+            const initialConfig = @Html.Raw(string.IsNullOrEmpty(Model.IdFormatJson) ? "null" : Model.IdFormatJson);
+            if(initialConfig && initialConfig.Elements) {
+                initialConfig.Elements.forEach(el => {
+                    const uiElement = createElementUI(el.Type);
+                    if (el.Type === 'FixedText') {
+                        uiElement.querySelector('input[name="value"]').value = el.Value;
+                    } else {
+                        uiElement.querySelector('input[name="format"]').value = el.Format;
+                    }
+                    editorEl.appendChild(uiElement);
+                });
+                serializeConfiguration();
+            }
+        });
+    </script>
+}

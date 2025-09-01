@@ -1,10 +1,15 @@
-﻿using InventoryManagement.Domain.Entities;
+﻿using InventoryManagement.Application.Models.CustomId;
+using InventoryManagement.Application.Services;
+using InventoryManagement.Domain.Entities;
 using InventoryManagement.Infrastructure;
 using InventoryManagement.WebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+
 
 namespace InventoryManagement.WebApp.Controllers
 {
@@ -12,14 +17,16 @@ namespace InventoryManagement.WebApp.Controllers
     public class InventoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICustomIdService _customIdService;
         private const int PageSize = 10; // Define page size
 
-        public InventoriesController(ApplicationDbContext context)
+        public InventoriesController(ApplicationDbContext context, ICustomIdService customIdService)
         {
             _context = context;
+            _customIdService = customIdService; 
         }
 
-        // MODIFIED: This action now only gets the FIRST page
+        // This action now only gets the FIRST page
         public async Task<IActionResult> Index()
         {
             var userId = GetCurrentUserId();
@@ -257,6 +264,87 @@ namespace InventoryManagement.WebApp.Controllers
                 ModelState.AddModelError(string.Empty, "These settings were modified by another user. Please reload and try again.");
                 return View(model);
             }
+        }
+
+        // GET: /Inventories/CustomId/5
+        public async Task<IActionResult> CustomId(int id)
+        {
+            var inventory = await _context.Inventories.FindAsync(id);
+            if (inventory == null) return NotFound();
+
+            if (inventory.CreatorId != GetCurrentUserId()) return Forbid();
+
+            var model = new CustomIdViewModel
+            {
+                InventoryId = inventory.Id,
+                InventoryTitle = inventory.Title,
+                RowVersion = inventory.RowVersion
+            };
+
+            if (!string.IsNullOrEmpty(inventory.CustomIdFormatJson))
+            {
+                // Define the options
+                var jsonOptions = new JsonSerializerOptions
+                {
+                    Converters = { new JsonStringEnumConverter() }
+                };
+
+                // ** THE FIX: Pass 'jsonOptions' as the second argument **
+                model.Configuration = JsonSerializer.Deserialize<CustomIdConfiguration>(inventory.CustomIdFormatJson, jsonOptions) ?? new CustomIdConfiguration();
+
+                model.IdFormatJson = inventory.CustomIdFormatJson;
+            }
+
+            return View(model);
+        }
+
+        // POST: /Inventories/CustomId/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CustomId(CustomIdViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                // Re-populate config if validation fails to redisplay the editor
+                if (!string.IsNullOrEmpty(model.IdFormatJson))
+                {
+                    // --- ADD THESE OPTIONS ---
+                    var jsonOptions = new JsonSerializerOptions
+                    {
+                        Converters = { new JsonStringEnumConverter() }
+                    };
+                    // --- USE THE OPTIONS IN THE CALL ---
+                    model.Configuration = JsonSerializer.Deserialize<CustomIdConfiguration>(model.IdFormatJson, jsonOptions) ?? new CustomIdConfiguration();
+                }
+                return View(model);
+            }
+
+            var inventoryToUpdate = await _context.Inventories.FindAsync(model.InventoryId);
+            if (inventoryToUpdate == null) return NotFound();
+
+            if (inventoryToUpdate.CreatorId != GetCurrentUserId()) return Forbid();
+
+            _context.Entry(inventoryToUpdate).Property("RowVersion").OriginalValue = model.RowVersion;
+            inventoryToUpdate.CustomIdFormatJson = model.IdFormatJson;
+            inventoryToUpdate.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Custom ID format saved successfully!";
+            return RedirectToAction(nameof(CustomId), new { id = model.InventoryId });
+        }
+
+        // POST: /Inventories/GeneratePreviewId
+        [HttpPost]
+        public async Task<IActionResult> GeneratePreviewId(int inventoryId, [FromBody] CustomIdConfiguration config)
+        {
+            var inventory = await _context.Inventories.FindAsync(inventoryId);
+            if (inventory == null) return NotFound();
+
+            // Temporarily apply the new format for preview generation
+            inventory.CustomIdFormatJson = JsonSerializer.Serialize(config);
+
+            var previewId = await _customIdService.GeneratePreviewIdAsync(inventory);
+            return Ok(new { id = previewId });
         }
     }
 }

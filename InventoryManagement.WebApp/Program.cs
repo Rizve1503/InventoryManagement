@@ -4,6 +4,8 @@ using InventoryManagement.Infrastructure;
 using InventoryManagement.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +20,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // 2. Add Custom Application Services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<ICustomIdService, CustomIdService>();
 
 // 3. Add Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -30,7 +33,13 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     });
 
 // 4. Add controllers and views
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        // This will serialize enums as strings (e.g., "FixedText") instead of numbers (e.g., 0)
+        // and will handle case-insensitivity when deserializing.
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 
 // --- End of Service Configuration ---

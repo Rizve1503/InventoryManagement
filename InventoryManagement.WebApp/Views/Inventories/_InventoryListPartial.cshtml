@@ -18,10 +18,11 @@
         <td>@item.Items.Count</td>
         <td>@item.CreatedAt.ToShortDateString()</td>
         <td>
-            <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
-            <a asp-controller="Items" asp-action="Index" asp-route-inventoryId="@item.Id" class="btn btn-sm btn-outline-primary">Items (@item.Items.Count)</a>
+@*             <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+ *@            <a asp-controller="Items" asp-action="Index" asp-route-inventoryId="@item.Id" class="btn btn-sm btn-outline-primary">Items (@item.Items.Count)</a>
             <a asp-controller="Inventories" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Settings</a>
             <a asp-controller="Inventories" asp-action="Fields" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Fields</a>
+            <a asp-controller="Inventories" asp-action="CustomId" asp-route-id="@item.Id" class="btn btn-sm btn-outline-success">Custom ID</a>
 
         </td>
     </tr>

@@ -1,4 +1,5 @@
-﻿using InventoryManagement.Domain.Entities;
+﻿using InventoryManagement.Application.Services;
+using InventoryManagement.Domain.Entities;
 using InventoryManagement.Infrastructure;
 using InventoryManagement.WebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -12,10 +13,12 @@ namespace InventoryManagement.WebApp.Controllers
     public class ItemsController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ICustomIdService _customIdService;
 
-        public ItemsController(ApplicationDbContext context)
+        public ItemsController(ApplicationDbContext context, ICustomIdService customIdService)
         {
             _context = context;
+            _customIdService = customIdService;
         }
 
         // GET: /Items/Index/5 (InventoryId)
@@ -97,6 +100,9 @@ namespace InventoryManagement.WebApp.Controllers
                     // This is an unexpected error
                     return BadRequest("Item data is missing.");
                 }
+
+                // Generate Custom ID if format is defined
+                itemToCreate.CustomId = await _customIdService.GenerateIdAsync(inventory);
 
                 itemToCreate.InventoryId = model.InventoryId;
                 itemToCreate.CreatedAt = DateTime.UtcNow;
