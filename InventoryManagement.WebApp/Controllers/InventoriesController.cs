@@ -92,7 +92,7 @@ namespace InventoryManagement.WebApp.Controllers
             return View(model);
         }
 
-        // GET: /Inventories/Edit/5 (No changes to this action)
+        // GET: /Inventories/Edit/5 
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -100,7 +100,11 @@ namespace InventoryManagement.WebApp.Controllers
                 return NotFound();
             }
 
-            var inventory = await _context.Inventories.FindAsync(id);
+            //var inventory = await _context.Inventories.FindAsync(id);
+
+            var inventory = await _context.Inventories
+                            .Include(i => i.Tags)
+                            .FirstOrDefaultAsync(i => i.Id == id);
 
             if (inventory == null)
             {
@@ -118,7 +122,9 @@ namespace InventoryManagement.WebApp.Controllers
                 Title = inventory.Title,
                 Description = inventory.Description,
                 IsPublic = inventory.IsPublic,
-                RowVersion = inventory.RowVersion
+                RowVersion = inventory.RowVersion,
+                Tags = string.Join(",", inventory.Tags.Select(t => t.Name))
+
             };
 
             return View(model);
@@ -139,7 +145,11 @@ namespace InventoryManagement.WebApp.Controllers
                 return View(model);
             }
 
-            var inventoryToUpdate = await _context.Inventories.FindAsync(id);
+            //var inventoryToUpdate = await _context.Inventories.FindAsync(id);
+
+            var inventoryToUpdate = await _context.Inventories
+                        .Include(i => i.Tags)
+                        .FirstOrDefaultAsync(i => i.Id == id);
 
             if (inventoryToUpdate == null)
             {
@@ -158,6 +168,8 @@ namespace InventoryManagement.WebApp.Controllers
             inventoryToUpdate.Description = model.Description;
             inventoryToUpdate.IsPublic = model.IsPublic;
             inventoryToUpdate.UpdatedAt = DateTime.UtcNow;
+
+            await UpdateInventoryTags(inventoryToUpdate, model.Tags);
 
             try
             {
@@ -345,6 +357,57 @@ namespace InventoryManagement.WebApp.Controllers
 
             var previewId = await _customIdService.GeneratePreviewIdAsync(inventory);
             return Ok(new { id = previewId });
+        }
+
+        private async Task UpdateInventoryTags(Inventory inventory, string? tagsString)
+        {
+            // Clear existing tags
+            inventory.Tags.Clear();
+
+            if (string.IsNullOrWhiteSpace(tagsString))
+            {
+                return;
+            }
+
+            // Split the input string into individual tag names
+            var tagNames = tagsString.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+                                     .Select(t => t.Trim().ToLower())
+                                     .Distinct();
+
+            foreach (var tagName in tagNames)
+            {
+                if (string.IsNullOrEmpty(tagName)) continue;
+
+                // Check if the tag already exists in the database
+                var existingTag = await _context.Tags.FirstOrDefaultAsync(t => t.Name == tagName);
+                if (existingTag != null)
+                {
+                    // If it exists, add it to the inventory
+                    inventory.Tags.Add(existingTag);
+                }
+                else
+                {
+                    // If it's a new tag, create it and add it
+                    var newTag = new Tag { Name = tagName };
+                    inventory.Tags.Add(newTag);
+                    // EF Core will automatically add the new tag to the Tags table
+                }
+            }
+        }
+
+        // GET: /Inventories/SearchTags?term=...
+        [HttpGet]
+        public async Task<IActionResult> SearchTags(string term)
+        {
+            if (!string.IsNullOrEmpty(term))
+            {
+                var tags = await _context.Tags
+                    .Where(t => t.Name.ToLower().StartsWith(term.ToLower()))
+                    .Select(t => t.Name)
+                    .ToListAsync();
+                return Json(tags);
+            }
+            return Json(new List<string>());
         }
     }
 }

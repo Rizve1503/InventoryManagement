@@ -31,6 +31,10 @@ namespace InventoryManagement.Infrastructure.Data.Configurations
             // Configure RowVersion for optimistic concurrency
             builder.Property(i => i.RowVersion)
                 .IsRowVersion();
+            // Configure the many-to-many relationship with Tag
+            // EF Core will automatically create a join table called 'InventoryTag'
+            builder.HasMany(i => i.Tags)
+                .WithMany(t => t.Inventories);
         }
     }
 }

@@ -15,6 +15,7 @@ namespace InventoryManagement.Infrastructure
         public DbSet<Role> Roles { get; set; }
         public DbSet<Inventory> Inventories { get; set; }
         public DbSet<Item> Items { get; set; }
+        public DbSet<Tag> Tags { get; set; }
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

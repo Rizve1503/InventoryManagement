@@ -7,6 +7,8 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
+    <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
 
 </head>
 <body>
@@ -22,8 +24,13 @@
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+
                         </li>
                     </ul>
+                    <form class="d-flex mx-auto" asp-controller="Search" asp-action="Index" method="get">
+                        <input class="form-control me-2" type="search" placeholder="Search Inventories..." aria-label="Search" name="query">
+                        <button class="btn btn-outline-success" type="submit">Search</button>
+                    </form>
                     <partial name="_LoginPartial" />
                 </div>
             </div>

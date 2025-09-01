@@ -68,5 +68,6 @@ namespace InventoryManagement.Domain.Entities
         public string CustomLink3Name { get; set; } = string.Empty;
         public string? CustomIdFormatJson { get; set; }
 
+        public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
     }
 }

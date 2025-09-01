@@ -1,9 +1,74 @@
-﻿@{
+﻿@model HomeViewModel
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>This is the starting point for the Inventory Management System.</p>
-    <p> Project foundation is set up and deployable.</p>
+<div class="jumbotron bg-light p-5 rounded-lg mb-4">
+    <h1 class="display-4">Welcome to Inventra!</h1>
+    <p class="lead">Your modern solution for collaborative inventory management.</p>
 </div>
+
+<div class="row">
+    <!-- Left Column: Inventories -->
+    <div class="col-md-8">
+        <h4>Latest Inventories</h4>
+        <div class="list-group mb-4">
+            @foreach (var inventory in Model.LatestInventories)
+            {
+                <a asp-controller="Items" asp-action="Index" asp-route-inventoryId="@inventory.Id" class="list-group-item list-group-item-action">
+                    @inventory.Title
+                </a>
+            }
+        </div>
+
+        <h4>Most Popular Inventories</h4>
+        <div class="list-group">
+            @foreach (var inventory in Model.TopInventories)
+            {
+                <a asp-controller="Items" asp-action="Index" asp-route-inventoryId="@inventory.Id" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                    @inventory.Title
+                    <span class="badge bg-primary rounded-pill">@inventory.Items.Count Items</span>
+                </a>
+            }
+        </div>
+    </div>
+
+    <!-- Right Column: Tag Cloud -->
+    <div class="col-md-4">
+        <h4>Discover by Tag</h4>
+        <div class="card">
+            <div class="card-body tag-cloud">
+                @foreach (var tag in Model.TagCloud)
+                {
+                    <a asp-controller="Search" asp-action="Tag" asp-route-tagName="@tag.TagName"
+                       class="tag-item" style="font-size: @(1 + (tag.InventoryCount * 0.2))em;">
+                        @tag.TagName
+                    </a>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <style>
+        .tag-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .tag-item {
+            text-decoration: none;
+            color: var(--bs-primary);
+            padding: 5px;
+            line-height: 1;
+        }
+
+            .tag-item:hover {
+                text-decoration: underline;
+            }
+    </style>
+}

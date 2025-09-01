@@ -18,5 +18,8 @@ namespace InventoryManagement.WebApp.ViewModels
 
         // For optimistic concurrency
         public byte[]? RowVersion { get; set; }
+
+        [Display(Name = "Tags (comma-separated)")]
+        public string? Tags { get; set; }
     }
 }
