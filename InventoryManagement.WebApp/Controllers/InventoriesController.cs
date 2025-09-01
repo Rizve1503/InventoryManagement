@@ -130,6 +130,21 @@ namespace InventoryManagement.WebApp.Controllers
             return View(model);
         }
 
+        // GET: /Inventories/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var inventory = await _context.Inventories
+                .Include(i => i.Creator)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (inventory == null)
+            {
+                return NotFound();
+            }
+
+            // Pass the inventory to the view
+            return View(inventory);
+        }
         // POST: /Inventories/Edit/5 (No changes to this action)
         [HttpPost]
         [ValidateAntiForgeryToken]

@@ -1,0 +1,83 @@
+﻿@model Inventory
+
+@{
+    ViewData["Title"] = Model.Title;
+}
+
+<h1>@Model.Title</h1>
+<p class="text-muted">Created by: @Model.Creator?.Name on @Model.CreatedAt.ToShortDateString()</p>
+<p>@Model.Description</p>
+<hr />
+
+<div class="mt-4">
+    <ul class="nav nav-tabs" id="inventoryTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="items-tab" data-bs-toggle="tab" data-bs-target="#items" type="button" role="tab">Items</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="discussion-tab" data-bs-toggle="tab" data-bs-target="#discussion" type="button" role="tab">Discussion</button>
+        </li>
+    </ul>
+    <div class="tab-content" id="inventoryTabContent">
+        <div class="tab-pane fade show active" id="items" role="tabpanel">
+            @* We will load the Items list here later *@
+            <div class="p-3">Items will be displayed here.</div>
+        </div>
+        <div class="tab-pane fade" id="discussion" role="tabpanel">
+            <div class="p-3">
+                <div id="comments-container" class="mb-4">
+                    <!-- Comments will be loaded here by AJAX -->
+                    <div class="text-center"><div class="spinner-border"></div></div>
+                </div>
+
+                <form id="comment-form" asp-controller="Comments" asp-action="Create" method="post">
+                    <input type="hidden" name="InventoryId" value="@Model.Id" />
+                    <div class="mb-3">
+                        <label for="comment-content" class="form-label">Leave a comment</label>
+                        <textarea id="comment-content" name="Content" class="form-control" rows="3" required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Post Comment</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            const inventoryId = @Model.Id;
+            const commentsContainer = $('#comments-container');
+            const commentForm = $('#comment-form');
+            const contentTextarea = $('#comment-content');
+
+            // Function to load comments
+            function loadComments() {
+                $.get(`/Comments/GetCommentsForInventory?inventoryId=${inventoryId}`, function(data) {
+                    commentsContainer.html(data);
+                });
+            }
+
+            // Handle comment form submission
+            commentForm.on('submit', function(e) {
+                e.preventDefault();
+                const formData = $(this).serialize();
+
+                $.post('/Comments/Create', formData)
+                    .done(function(newCommentHtml) {
+                        commentsContainer.append(newCommentHtml);
+                        contentTextarea.val(''); // Clear textarea
+                    })
+                    .fail(function() {
+                        alert('Error posting comment.');
+                    });
+            });
+
+            // Initial load
+            loadComments();
+
+            // Polling for near real-time updates every 7 seconds
+            setInterval(loadComments, 7000);
+        });
+    </script>
+}

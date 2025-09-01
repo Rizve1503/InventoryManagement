@@ -1,0 +1,6 @@
+﻿@model List<Comment>
+
+@foreach (var comment in Model)
+{
+    @await Html.PartialAsync("_CommentSinglePartial", comment)
+}

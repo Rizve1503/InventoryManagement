@@ -1,0 +1,10 @@
+﻿@model Comment
+
+<div class="card mb-2">
+    <div class="card-body">
+        <p class="card-text">@Model.Content</p>
+    </div>
+    <div class="card-footer text-muted small">
+        Posted by <strong>@Model.Author?.Name</strong> on @Model.CreatedAt.ToString("g")
+    </div>
+</div>
