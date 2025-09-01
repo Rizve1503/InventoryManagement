@@ -2,36 +2,33 @@
 
 @{
     ViewData["Title"] = "My Inventories";
+    var viewType = ViewBag.ViewType as string ?? "list";
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>@ViewData["Title"]</h1>
-    <a asp-action="Create" class="btn btn-primary">Create New Inventory</a>
+    <div>
+        <div class="btn-group" role="group">
+            <button id="list-view-btn" type="button" class="btn @(viewType == "list" ? "btn-primary" : "btn-outline-primary")"><i class="bi bi-list-ul"></i></button>
+            <button id="card-view-btn" type="button" class="btn @(viewType == "card" ? "btn-primary" : "btn-outline-primary")"><i class="bi bi-grid-3x3-gap-fill"></i></button>
+        </div>
+        <a asp-action="Create" class="btn btn-success ms-2">Create New Inventory</a>
+    </div>
 </div>
 
 @if (!Model.Any())
 {
-    <div class="text-center">
-        <p>You haven't created any inventories yet.</p>
-    </div>
+    <div class="text-center"><p>You haven't created any inventories yet.</p></div>
 }
 else
 {
-    <table class="table table-hover">
-        <thead class="thead-light">
-            <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Status</th>
-                <th>Items</th>
-                <th>Created</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody id="inventory-table-body">
-            <partial name="_InventoryListPartial" model="Model" />
-        </tbody>
-    </table>
+    @* This container will hold either the table or the card grid *@
+    <div id="inventory-container" class="@(viewType == "card" ? "row" : "")">
+        @{
+            string partialName = viewType == "card" ? "_InventoryCardPartial" : "_InventoryListPartial";
+        }
+        <partial name="@partialName" model="Model" />
+    </div>
 
     @if (ViewBag.HasMoreInventories == true)
     {
@@ -44,40 +41,56 @@ else
 }
 
 @section Scripts {
-    @if (ViewBag.HasMoreInventories == true)
-    {
-        <script>
-            $(document).ready(function () {
-                let page = 2;
-                let isLoading = false;
-                let hasMore = true;
+    <script>
+        $(document).ready(function () {
+            let page = 2;
+            let isLoading = false;
+            let hasMore = @(ViewBag.HasMoreInventories.ToString().ToLower());
+            let currentView = '@viewType';
 
-                $(window).scroll(function () {
-                    // Check if we are near the bottom of the page, not currently loading, and there's more data to fetch
-                    if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200 && !isLoading && hasMore) {
-                        isLoading = true;
-                        $('#loading-indicator').show();
+            function setViewType(view) {
+                // Set cookie that expires in 1 year
+                document.cookie = `InventoryViewType=${view}; path=/; max-age=31536000`;
+                currentView = view;
+                $('#list-view-btn').toggleClass('btn-primary', view === 'list').toggleClass('btn-outline-primary', view !== 'list');
+                $('#card-view-btn').toggleClass('btn-primary', view === 'card').toggleClass('btn-outline-primary', view !== 'card');
+                $('#inventory-container').toggleClass('row', view === 'card');
+            }
 
-                        $.get('/Inventories/GetInventoriesPage?page=' + page, function (data) {
-                            if (data.trim().length > 0) {
-                                $('#inventory-table-body').append(data);
-                                page++;
-                                isLoading = false;
-                                $('#loading-indicator').hide();
-                            } else {
-                                // No more data to load
-                                hasMore = false;
-                                $('#loading-indicator').hide();
-                            }
-                        }).fail(function() {
-                            // Handle potential errors, e.g., stop trying to load more
-                            hasMore = false;
-                            isLoading = false;
-                            $('#loading-indicator').hide();
-                        });
-                    }
-                });
+            $('#list-view-btn').on('click', function() {
+                if (currentView !== 'list') {
+                    setViewType('list');
+                    // For simplicity, we just reload the page to switch the view
+                    window.location.reload();
+                }
             });
-        </script>
-    }
+
+            $('#card-view-btn').on('click', function() {
+                if (currentView !== 'card') {
+                    setViewType('card');
+                    window.location.reload();
+                }
+            });
+
+            $(window).scroll(function () {
+                if ($(window).scrollTop() + $(window).height() >= $(document).height() - 200 && !isLoading && hasMore) {
+                    isLoading = true;
+                    $('#loading-indicator').show();
+
+                    // Pass the current view type to the AJAX call
+                    $.get(`/Inventories/GetInventoriesPage?page=${page}&viewType=${currentView}`, function (data) {
+                        if (data.trim().length > 0) {
+                            $('#inventory-container').append(data);
+                            page++;
+                            isLoading = false;
+                        } else {
+                            hasMore = false;
+                        }
+                    }).always(function() {
+                        $('#loading-indicator').hide();
+                    });
+                }
+            });
+        });
+    </script>
 }

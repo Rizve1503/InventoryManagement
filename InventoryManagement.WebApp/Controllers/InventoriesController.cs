@@ -30,6 +30,11 @@ namespace InventoryManagement.WebApp.Controllers
         public async Task<IActionResult> Index()
         {
             var userId = GetCurrentUserId();
+
+            // Read the view preference from the cookie, default to "list" if not set
+            string viewType = Request.Cookies["InventoryViewType"] ?? "list";
+            ViewBag.ViewType = viewType; // Pass the preference to the view
+
             var userInventories = await _context.Inventories
                 .Where(i => i.CreatorId == userId)
                 .OrderByDescending(i => i.CreatedAt)
@@ -44,7 +49,7 @@ namespace InventoryManagement.WebApp.Controllers
 
         // NEW ACTION: This action will be called by AJAX to get subsequent pages
         [HttpGet]
-        public async Task<IActionResult> GetInventoriesPage(int page = 2)
+        public async Task<IActionResult> GetInventoriesPage(int page = 2, string viewType = "list")
         {
             var userId = GetCurrentUserId();
             var userInventories = await _context.Inventories
@@ -59,6 +64,12 @@ namespace InventoryManagement.WebApp.Controllers
             {
                 return Content("");
             }
+
+            // Return the partial view corresponding to the requested view type
+            string partialViewName = viewType == "card" ? "_InventoryCardPartial" : "_InventoryListPartial";
+
+            // We need to pass necessary ViewBag data to partials
+            ViewBag.CurrentUserId = GetCurrentUserId();
 
             return PartialView("_InventoryListPartial", userInventories);
         }
@@ -442,6 +453,38 @@ namespace InventoryManagement.WebApp.Controllers
             ViewBag.Inventory = inventory;
 
             return PartialView("_ItemListPartial", items);
+        }
+
+        // GET: Inventories/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var inventory = await _context.Inventories
+                .Include(i => i.Creator)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (inventory == null) return NotFound();
+
+            // Authorization Check
+            if (inventory.CreatorId != GetCurrentUserId()) return Forbid();
+
+            return View(inventory);
+        }
+
+        // POST: Inventories/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var inventory = await _context.Inventories.FindAsync(id);
+            if (inventory == null) return NotFound();
+
+            // Authorization Check
+            if (inventory.CreatorId != GetCurrentUserId()) return Forbid();
+
+            _context.Inventories.Remove(inventory);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
         }
     }
 }

@@ -18,12 +18,19 @@
         <td>@item.Items.Count</td>
         <td>@item.CreatedAt.ToShortDateString()</td>
         <td>
-            <a asp-controller="Inventories" asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary">View</a>
-            <a asp-controller="Items" asp-action="Index" asp-route-inventoryId="@item.Id" class="btn btn-sm btn-outline-primary">Items (@item.Items.Count)</a>
-            <a asp-controller="Inventories" asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Settings</a>
-            <a asp-controller="Inventories" asp-action="Fields" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Fields</a>
-            <a asp-controller="Inventories" asp-action="CustomId" asp-route-id="@item.Id" class="btn btn-sm btn-outline-success">Custom ID</a>
-
+            <div class="dropdown">
+                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    Actions
+                </button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Details" asp-route-id="@item.Id">View</a></li>
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Edit" asp-route-id="@item.Id">Settings</a></li>
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Fields" asp-route-id="@item.Id">Fields</a></li>
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="CustomId" asp-route-id="@item.Id">Custom ID</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" asp-controller="Inventories" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
+                </ul>
+            </div>
         </td>
     </tr>
 }

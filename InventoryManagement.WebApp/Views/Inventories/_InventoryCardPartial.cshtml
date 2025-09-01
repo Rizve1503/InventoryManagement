@@ -1,0 +1,29 @@
+﻿@model List<Inventory>
+
+@foreach (var item in Model)
+{
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="card-title">@item.Title</h5>
+                <p class="card-text">@item.Description</p>
+            </div>
+            <div class="card-footer">
+                <small class="text-muted">Created on @item.CreatedAt.ToShortDateString()</small>
+                <div class="dropdown float-end">
+                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Actions
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Details" asp-route-id="@item.Id">View</a></li>
+                        <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Edit" asp-route-id="@item.Id">Settings</a></li>
+                        <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Fields" asp-route-id="@item.Id">Fields</a></li>
+                        <li><a class="dropdown-item" asp-controller="Inventories" asp-action="CustomId" asp-route-id="@item.Id">Custom ID</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item text-danger" asp-controller="Inventories" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+}

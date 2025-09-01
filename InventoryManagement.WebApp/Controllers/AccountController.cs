@@ -4,6 +4,7 @@ using InventoryManagement.Infrastructure;
 using InventoryManagement.WebApp.ViewModels;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
@@ -23,6 +24,12 @@ namespace InventoryManagement.WebApp.Controllers
 
         [HttpGet]
         public IActionResult Login()
+        {
+            return View();
+        }
+
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
         {
             return View();
         }
