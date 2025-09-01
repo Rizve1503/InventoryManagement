@@ -424,5 +424,24 @@ namespace InventoryManagement.WebApp.Controllers
             }
             return Json(new List<string>());
         }
+        // GET: /Inventories/GetItemsForInventory?inventoryId=5
+        [HttpGet]
+        public async Task<IActionResult> GetItemsForInventory(int inventoryId)
+        {
+            var inventory = await _context.Inventories.FindAsync(inventoryId);
+            if (inventory == null) return NotFound();
+
+            var items = await _context.Items
+                .Include(i => i.Likes) // Eager load the likes
+                .Where(i => i.InventoryId == inventoryId)
+                .OrderByDescending(i => i.CreatedAt)
+                .ToListAsync();
+
+            // Pass the current user ID to the view to determine if they've liked each item
+            ViewBag.CurrentUserId = GetCurrentUserId();
+            ViewBag.Inventory = inventory;
+
+            return PartialView("_ItemListPartial", items);
+        }
     }
 }

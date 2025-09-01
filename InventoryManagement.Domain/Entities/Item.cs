@@ -47,6 +47,9 @@ namespace InventoryManagement.Domain.Entities
         public string? CustomLink1Value { get; set; }
         public string? CustomLink2Value { get; set; }
         public string? CustomLink3Value { get; set; }
+
+        public virtual ICollection<Like> Likes { get; set; } = new List<Like>();
+
     }
 }
 

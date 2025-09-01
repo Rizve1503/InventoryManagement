@@ -1,0 +1,56 @@
+﻿@model List<Item>
+
+@{
+    var inventory = ViewBag.Inventory as Inventory;
+    var currentUserId = ViewBag.CurrentUserId as int?;
+}
+
+<div class="d-flex justify-content-end mb-3">
+    <a asp-controller="Items" asp-action="Create" asp-route-inventoryId="@inventory.Id" class="btn btn-success">Add New Item</a>
+</div>
+
+<table class="table table-bordered table-striped">
+    <thead class="thead-light">
+        <tr>
+            @if (inventory.CustomString1State)
+            {
+                <th>@inventory.CustomString1Name</th>
+            }
+            @if (inventory.CustomString2State)
+            {
+                <th>@inventory.CustomString2Name</th>
+            }
+            @* Add other header columns as needed *@
+            <th>Created</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                @if (inventory.CustomString1State)
+                {
+                    <td>@item.CustomString1Value</td>
+                }
+                @if (inventory.CustomString2State)
+                {
+                    <td>@item.CustomString2Value</td>
+                }
+                @* Add other data cells as needed *@
+                <td>@item.CreatedAt.ToShortDateString()</td>
+                <td>
+                    @{
+                        // Check if the current user has liked this specific item
+                        var userHasLiked = currentUserId.HasValue && item.Likes.Any(l => l.UserId == currentUserId.Value);
+                        var buttonClass = userHasLiked ? "btn-primary" : "btn-outline-primary";
+                    }
+                    <button class="btn btn-sm @buttonClass like-btn" data-item-id="@item.Id">
+                        <i class="bi bi-hand-thumbs-up"></i> Like <span class="badge bg-light text-dark like-count">@item.Likes.Count</span>
+                    </button>
+                    @* Add Edit/Delete buttons here later *@
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

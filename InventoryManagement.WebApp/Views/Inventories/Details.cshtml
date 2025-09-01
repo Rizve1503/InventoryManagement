@@ -20,7 +20,12 @@
     </ul>
     <div class="tab-content" id="inventoryTabContent">
         <div class="tab-pane fade show active" id="items" role="tabpanel">
-            @* We will load the Items list here later *@
+            <div class="p-3" id="items-container">
+                <div class="text-center">
+                    <div class="spinner-border">
+                    </div>
+                </div>
+            </div>            
             <div class="p-3">Items will be displayed here.</div>
         </div>
         <div class="tab-pane fade" id="discussion" role="tabpanel">
@@ -50,6 +55,7 @@
             const commentsContainer = $('#comments-container');
             const commentForm = $('#comment-form');
             const contentTextarea = $('#comment-content');
+            const itemsContainer = $('#items-container');
 
             // Function to load comments
             function loadComments() {
@@ -78,6 +84,42 @@
 
             // Polling for near real-time updates every 7 seconds
             setInterval(loadComments, 7000);
+
+            
+            // Function to load items
+            function loadItems() {
+                $.get(`/Inventories/GetItemsForInventory?inventoryId=${inventoryId}`, function(data) {
+                    itemsContainer.html(data);
+                });
+            }
+
+            // Initial load of items when the page is ready
+            loadItems();
+
+            // Handle clicks on the like button (uses event delegation for dynamically loaded content)
+        itemsContainer.on('click', '.like-btn', function() {
+            const button = $(this);
+            const itemId = button.data('item-id');
+            const likeCountSpan = button.find('.like-count');
+
+            $.ajax({
+                url: '/api/Likes/ToggleLike',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ itemId: itemId }),
+                success: function(response) {
+                    likeCountSpan.text(response.count);
+                    if (response.liked) {
+                        button.removeClass('btn-outline-primary').addClass('btn-primary');
+                    } else {
+                        button.removeClass('btn-primary').addClass('btn-outline-primary');
+                    }
+                },
+                error: function() {
+                    alert('An error occurred.');
+                }
+            });
+        });
         });
     </script>
 }
