@@ -9,7 +9,8 @@ namespace InventoryManagement.WebApp.ViewModels
         public int Id { get; set; }
         public int InventoryId { get; set; }
         public Inventory? Inventory { get; set; } // To access field definitions
-        public Item? Item { get; set; } // The actual item data for editing or display
+       // public Item? Item { get; set; } // The actual item data for editing or display
+        public Item Item { get; set; } = new();
     }
 
     // A specific ViewModel for the Item Index page

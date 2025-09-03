@@ -12,6 +12,8 @@
         public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
         public virtual ICollection<Like> Likes { get; set; } = new List<Like>();
+        public bool IsBlocked { get; set; } = false;
+
 
     }
 }

@@ -44,6 +44,12 @@ namespace InventoryManagement.WebApp.Controllers
                     .Include(u => u.Role)
                     .FirstOrDefaultAsync(u => u.Email == model.Email);
 
+                if (user != null && user.IsBlocked)
+                {
+                    ModelState.AddModelError(string.Empty, "This account has been blocked.");
+                    return View(model);
+                }
+
                 if (user != null && _passwordService.VerifyPassword(model.Password, user.PasswordHash))
                 {
                     // === THIS IS THE SECTION TO CHANGE ===

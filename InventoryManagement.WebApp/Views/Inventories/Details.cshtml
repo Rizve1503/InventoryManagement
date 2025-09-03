@@ -22,20 +22,18 @@
         <div class="tab-pane fade show active" id="items" role="tabpanel">
             <div class="p-3" id="items-container">
                 <div class="text-center">
-                    <div class="spinner-border">
-                    </div>
+                    <div class="spinner-border"></div>
                 </div>
-            </div>            
-            <div class="p-3">Items will be displayed here.</div>
+            </div>
         </div>
         <div class="tab-pane fade" id="discussion" role="tabpanel">
             <div class="p-3">
                 <div id="comments-container" class="mb-4">
-                    <!-- Comments will be loaded here by AJAX -->
                     <div class="text-center"><div class="spinner-border"></div></div>
                 </div>
 
                 <form id="comment-form" asp-controller="Comments" asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
                     <input type="hidden" name="InventoryId" value="@Model.Id" />
                     <div class="mb-3">
                         <label for="comment-content" class="form-label">Leave a comment</label>
@@ -67,16 +65,25 @@
             // Handle comment form submission
             commentForm.on('submit', function(e) {
                 e.preventDefault();
+
+                const token = $(this).find('input[name="__RequestVerificationToken"]').val();
                 const formData = $(this).serialize();
 
-                $.post('/Comments/Create', formData)
-                    .done(function(newCommentHtml) {
+                $.ajax({
+                    url: '/Comments/Create',
+                    type: 'POST',
+                    data: formData,
+                    headers: {
+                        'RequestVerificationToken': token
+                    },
+                    success: function(newCommentHtml) {
                         commentsContainer.append(newCommentHtml);
                         contentTextarea.val(''); // Clear textarea
-                    })
-                    .fail(function() {
+                    },
+                    error: function() {
                         alert('Error posting comment.');
-                    });
+                    }
+                });
             });
 
             // Initial load
@@ -85,7 +92,6 @@
             // Polling for near real-time updates every 7 seconds
             setInterval(loadComments, 7000);
 
-            
             // Function to load items
             function loadItems() {
                 $.get(`/Inventories/GetItemsForInventory?inventoryId=${inventoryId}`, function(data) {
@@ -96,30 +102,30 @@
             // Initial load of items when the page is ready
             loadItems();
 
-            // Handle clicks on the like button (uses event delegation for dynamically loaded content)
-        itemsContainer.on('click', '.like-btn', function() {
-            const button = $(this);
-            const itemId = button.data('item-id');
-            const likeCountSpan = button.find('.like-count');
+            // Handle clicks on the like button
+            itemsContainer.on('click', '.like-btn', function() {
+                const button = $(this);
+                const itemId = button.data('item-id');
+                const likeCountSpan = button.find('.like-count');
 
-            $.ajax({
-                url: '/api/Likes/ToggleLike',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify({ itemId: itemId }),
-                success: function(response) {
-                    likeCountSpan.text(response.count);
-                    if (response.liked) {
-                        button.removeClass('btn-outline-primary').addClass('btn-primary');
-                    } else {
-                        button.removeClass('btn-primary').addClass('btn-outline-primary');
+                $.ajax({
+                    url: '/api/Likes/ToggleLike',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ itemId: itemId }),
+                    success: function(response) {
+                        likeCountSpan.text(response.count);
+                        if (response.liked) {
+                            button.removeClass('btn-outline-primary').addClass('btn-primary');
+                        } else {
+                            button.removeClass('btn-primary').addClass('btn-outline-primary');
+                        }
+                    },
+                    error: function() {
+                        alert('An error occurred.');
                     }
-                },
-                error: function() {
-                    alert('An error occurred.');
-                }
+                });
             });
-        });
         });
     </script>
 }

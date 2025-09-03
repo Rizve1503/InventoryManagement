@@ -3,6 +3,12 @@
 @if (User.Identity != null && User.Identity.IsAuthenticated)
 {
     <ul class="navbar-nav">
+        @if (User.IsInRole("Admin"))
+        {
+            <li class="nav-item">
+                <a class="nav-link text-primary" asp-controller="Admin" asp-action="Users">Admin Panel</a>
+            </li>
+        }
         <li class="nav-item">
             <a class="nav-link text-dark" asp-controller="Inventories" asp-action="Index">My Inventories</a>
         </li>

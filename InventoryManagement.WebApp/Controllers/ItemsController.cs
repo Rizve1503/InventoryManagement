@@ -21,6 +21,7 @@ namespace InventoryManagement.WebApp.Controllers
             _customIdService = customIdService;
         }
 
+        [AllowAnonymous]
         // GET: /Items/Index/5 (InventoryId)
         public async Task<IActionResult> Index(int inventoryId)
         {

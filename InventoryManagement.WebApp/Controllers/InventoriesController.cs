@@ -141,6 +141,7 @@ namespace InventoryManagement.WebApp.Controllers
             return View(model);
         }
 
+        [AllowAnonymous]
         // GET: /Inventories/Details/5
         public async Task<IActionResult> Details(int id)
         {
