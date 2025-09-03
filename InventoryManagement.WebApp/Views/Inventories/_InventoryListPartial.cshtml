@@ -1,10 +1,12 @@
-﻿@model IEnumerable<InventoryManagement.Domain.Entities.Inventory>
+﻿@* @model IEnumerable<InventoryManagement.Domain.Entities.Inventory>
 
 @foreach (var item in Model)
 {
     <tr>
-        <td>@Html.DisplayFor(modelItem => item.Title)</td>
-        <td>@(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</td>
+        <td>
+            <strong>@item.Title</strong><br />
+            <small class="text-muted">@item.Description</small>
+        </td>
         <td>
             @if (item.IsPublic)
             {
@@ -19,9 +21,44 @@
         <td>@item.CreatedAt.ToShortDateString()</td>
         <td>
             <div class="dropdown">
-                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                    Actions
-                </button>
+                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Actions</button>
+                <ul class="dropdown-menu">
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Details" asp-route-id="@item.Id">View</a></li>
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Edit" asp-route-id="@item.Id">Settings</a></li>
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Fields" asp-route-id="@item.Id">Fields</a></li>
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="CustomId" asp-route-id="@item.Id">Custom ID</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" asp-controller="Inventories" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
+                </ul>
+            </div>
+        </td>
+    </tr>
+} *@
+
+@model IEnumerable<InventoryManagement.Domain.Entities.Inventory>
+
+@foreach (var item in Model)
+{
+    <tr>
+        <td>
+            <strong>@item.Title</strong><br />
+            <small class="text-muted">@item.Description</small>
+        </td>
+        <td>
+            @if (item.IsPublic)
+            {
+                <span class="badge bg-success">Public</span>
+            }
+            else
+            {
+                <span class="badge bg-secondary">Private</span>
+            }
+        </td>
+        <td>@item.Items.Count</td>
+        <td>@item.CreatedAt.ToShortDateString()</td>
+        <td>
+            <div class="dropdown">
+                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Actions</button>
                 <ul class="dropdown-menu">
                     <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Details" asp-route-id="@item.Id">View</a></li>
                     <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Edit" asp-route-id="@item.Id">Settings</a></li>

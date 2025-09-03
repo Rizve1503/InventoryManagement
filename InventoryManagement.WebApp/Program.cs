@@ -5,7 +5,9 @@ using InventoryManagement.Infrastructure.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
-
+using System.Globalization;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -21,6 +23,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // 2. Add Custom Application Services
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<ICustomIdService, CustomIdService>();
+builder.Services.AddScoped<IFileStorageService, CloudinaryFileStorageService>();
 
 // 3. Add Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -32,15 +35,31 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 
+
+// 5. Add Localization
+builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
+
+
 // 4. Add controllers and views
 builder.Services.AddControllersWithViews()
+    .AddViewLocalization(Microsoft.AspNetCore.Mvc.Razor.LanguageViewLocationExpanderFormat.Suffix) 
     .AddJsonOptions(options =>
     {
-        // This will serialize enums as strings (e.g., "FixedText") instead of numbers (e.g., 0)
-        // and will handle case-insensitivity when deserializing.
         options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
     });
 
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    var supportedCultures = new[]
+    {
+        new CultureInfo("en-US"), // English (United States)
+        new CultureInfo("es-ES")  // Spanish (Spain)
+    };
+
+    options.DefaultRequestCulture = new RequestCulture("en-US");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
 
 // --- End of Service Configuration ---
 
@@ -58,6 +77,9 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+var locOptions = app.Services.GetRequiredService<IOptions<RequestLocalizationOptions>>();
+app.UseRequestLocalization(locOptions.Value);
 
 // Add Authentication and Authorization to the pipeline
 app.UseAuthentication();

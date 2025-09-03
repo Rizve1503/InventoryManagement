@@ -1,19 +1,17 @@
-﻿@model List<Inventory>
+﻿@model IEnumerable<InventoryManagement.Domain.Entities.Inventory>
 
 @foreach (var item in Model)
 {
-    <div class="col-md-4 mb-4">
-        <div class="card h-100">
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100 shadow-sm">
             <div class="card-body">
                 <h5 class="card-title">@item.Title</h5>
-                <p class="card-text">@item.Description</p>
+                <p class="card-text text-muted small">@item.Description</p>
             </div>
-            <div class="card-footer">
+            <div class="card-footer bg-white border-top-0 d-flex justify-content-between align-items-center">
                 <small class="text-muted">Created on @item.CreatedAt.ToShortDateString()</small>
-                <div class="dropdown float-end">
-                    <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                        Actions
-                    </button>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-dark dropdown-toggle" type="button" data-bs-toggle="dropdown">Actions</button>
                     <ul class="dropdown-menu">
                         <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Details" asp-route-id="@item.Id">View</a></li>
                         <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Edit" asp-route-id="@item.Id">Settings</a></li>

@@ -18,60 +18,62 @@ namespace InventoryManagement.WebApp.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ICustomIdService _customIdService;
+        private readonly IFileStorageService _fileStorageService;
+
         private const int PageSize = 10; // Define page size
 
-        public InventoriesController(ApplicationDbContext context, ICustomIdService customIdService)
+        public InventoriesController(ApplicationDbContext context, ICustomIdService customIdService, IFileStorageService fileStorageService)
         {
             _context = context;
-            _customIdService = customIdService; 
+            _customIdService = customIdService;
+            _fileStorageService = fileStorageService; // Add this
         }
 
         // This action now only gets the FIRST page
         public async Task<IActionResult> Index()
         {
             var userId = GetCurrentUserId();
-
-            // Read the view preference from the cookie, default to "list" if not set
             string viewType = Request.Cookies["InventoryViewType"] ?? "list";
-            ViewBag.ViewType = viewType; // Pass the preference to the view
+            ViewBag.ViewType = viewType;
 
             var userInventories = await _context.Inventories
+                .Include(i => i.Items) // Eager load Items for the count
                 .Where(i => i.CreatorId == userId)
                 .OrderByDescending(i => i.CreatedAt)
                 .Take(PageSize)
                 .ToListAsync();
 
-            // Used to determine if we need to show the loader and enable the script
             ViewBag.HasMoreInventories = (await _context.Inventories.CountAsync(i => i.CreatorId == userId)) > PageSize;
-
             return View(userInventories);
         }
 
         // NEW ACTION: This action will be called by AJAX to get subsequent pages
+        // Inside the InventoriesController, find the GetInventoriesPage action.
+
         [HttpGet]
         public async Task<IActionResult> GetInventoriesPage(int page = 2, string viewType = "list")
         {
             var userId = GetCurrentUserId();
             var userInventories = await _context.Inventories
+                .Include(i => i.Items)
                 .Where(i => i.CreatorId == userId)
                 .OrderByDescending(i => i.CreatedAt)
                 .Skip((page - 1) * PageSize)
                 .Take(PageSize)
                 .ToListAsync();
 
-            // If there's nothing to return, return an empty result
             if (!userInventories.Any())
             {
                 return Content("");
             }
 
-            // Return the partial view corresponding to the requested view type
+            // This line correctly determines the partial view name
             string partialViewName = viewType == "card" ? "_InventoryCardPartial" : "_InventoryListPartial";
 
-            // We need to pass necessary ViewBag data to partials
             ViewBag.CurrentUserId = GetCurrentUserId();
 
-            return PartialView("_InventoryListPartial", userInventories);
+            // ** THE FIX: Use the 'partialViewName' variable here. **
+            return PartialView(partialViewName, userInventories);
         }
 
         // GET: /Inventories/Create
@@ -134,7 +136,8 @@ namespace InventoryManagement.WebApp.Controllers
                 Description = inventory.Description,
                 IsPublic = inventory.IsPublic,
                 RowVersion = inventory.RowVersion,
-                Tags = string.Join(",", inventory.Tags.Select(t => t.Name))
+                Tags = string.Join(",", inventory.Tags.Select(t => t.Name)),
+                ExistingImageUrl = inventory.ImageUrl
 
             };
 
@@ -195,6 +198,17 @@ namespace InventoryManagement.WebApp.Controllers
             inventoryToUpdate.Description = model.Description;
             inventoryToUpdate.IsPublic = model.IsPublic;
             inventoryToUpdate.UpdatedAt = DateTime.UtcNow;
+
+            if (model.ImageFile != null && model.ImageFile.Length > 0)
+            {
+                // Delete the old image if it exists
+                if (!string.IsNullOrEmpty(inventoryToUpdate.ImageUrl))
+                {
+                    _fileStorageService.DeleteFile(inventoryToUpdate.ImageUrl);
+                }
+                // Save the new image and store its unique name in the database
+                inventoryToUpdate.ImageUrl = await _fileStorageService.SaveFileAsync(model.ImageFile);
+            }
 
             await UpdateInventoryTags(inventoryToUpdate, model.Tags);
 

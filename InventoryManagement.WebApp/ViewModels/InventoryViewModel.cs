@@ -21,5 +21,10 @@ namespace InventoryManagement.WebApp.ViewModels
 
         [Display(Name = "Tags (comma-separated)")]
         public string? Tags { get; set; }
+
+
+        [Display(Name = "Inventory Image")]
+        public IFormFile? ImageFile { get; set; } // For the file upload
+        public string? ExistingImageUrl { get; set; } // To display the current image
     }
 }
