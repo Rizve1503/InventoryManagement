@@ -17,6 +17,8 @@ namespace InventoryManagement.WebApp.ViewModels
         public string FieldName { get; set; } = string.Empty;
         public string MostFrequentValue { get; set; } = "N/A";
         public int Frequency { get; set; }
+        public Dictionary<string, int> TopValues { get; set; } = new Dictionary<string, int>();
+
     }
 
     // The main ViewModel for the entire stats page

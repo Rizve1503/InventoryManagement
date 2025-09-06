@@ -1,41 +1,33 @@
 ﻿@model Inventory
-
 @{
     ViewData["Title"] = Model.Title;
 }
-
 <h1>@Model.Title</h1>
 <p class="text-muted">Created by: @Model.Creator?.Name on @Model.CreatedAt.ToShortDateString()</p>
 <p>@Model.Description</p>
 <hr />
-
 <div class="mt-4">
-    <ul class="nav nav-tabs" id="inventoryTab" role="tablist">
+    <ul class="nav nav-tabs mb-3" id="inventoryTab" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="items-tab" data-bs-toggle="tab" data-bs-target="#items" type="button" role="tab">Items</button>
+            <button class="nav-link active" id="items-tab" data-bs-toggle="tab" data-bs-target="#items" type="button" role="tab" aria-controls="items" aria-selected="true">Items</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="discussion-tab" data-bs-toggle="tab" data-bs-target="#discussion" type="button" role="tab">Discussion</button>
+            <button class="nav-link" id="discussion-tab" data-bs-toggle="tab" data-bs-target="#discussion" type="button" role="tab" aria-controls="discussion" aria-selected="false">Discussion</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab">Stats</button>
+            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab" aria-controls="stats" aria-selected="false">Stats</button>
         </li>
     </ul>
     <div class="tab-content" id="inventoryTabContent">
-        <div class="tab-pane fade show active" id="items" role="tabpanel">
-            <div class="p-3" id="items-container">
-                <div class="text-center"><div class="spinner-border"></div></div>
-            </div>
+        <div class="tab-pane fade show active" id="items" role="tabpanel" aria-labelledby="items-tab">
+            <div class="p-3" id="items-container"><div class="text-center"><div class="spinner-border"></div></div></div>
         </div>
-        <div class="tab-pane fade" id="discussion" role="tabpanel">
+        <div class="tab-pane fade" id="discussion" role="tabpanel" aria-labelledby="discussion-tab">
             <div class="p-3">
-                <div id="comments-container" class="mb-4">
-                    <div class="text-center"><div class="spinner-border"></div></div>
-                </div>
-
-                @if (User.Identity.IsAuthenticated)
+                <div id="comments-container" class="mb-4"><div class="text-center"><div class="spinner-border"></div></div></div>
+                @if (User.Identity != null && User.Identity.IsAuthenticated)
                 {
-                    <form id="comment-form" asp-controller="Comments" asp-action="Create" method="post">
+                    <form id="comment-form" method="post">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="InventoryId" value="@Model.Id" />
                         <div class="mb-3">
@@ -47,20 +39,12 @@
                 }
                 else
                 {
-                    <div class="alert alert-info">
-                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Sign in</a> to post a comment.
-                    </div>
+                    <div class="alert alert-info"><a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Sign in</a> to post a comment.</div>
                 }
             </div>
         </div>
-        <div class="tab-pane fade" id="stats" role="tabpanel">
-            <div class="p-3" id="stats-container">
-                <div class="text-center">
-                    <div class="spinner-border">
-                    
-                    </div>
-                </div>
-            </div>
+        <div class="tab-pane fade" id="stats" role="tabpanel" aria-labelledby="stats-tab">
+            <div class="p-3" id="stats-container"><div class="text-center"><div class="spinner-border"></div></div></div>
         </div>
     </div>
 </div>
@@ -68,79 +52,71 @@
 @section Scripts {
     <script>
         $(document).ready(function() {
-            const inventoryId = @Model.Id;
-            const commentsContainer = $('#comments-container');
-            const commentForm = $('#comment-form');
-            const contentTextarea = $('#comment-content');
-            const itemsContainer = $('#items-container');
-            const statsContainer = $('#stats-container');
-
-            function loadComments() {
-                $.get(`/Comments/GetCommentsForInventory?inventoryId=${inventoryId}`, function(data) {
-                    commentsContainer.html(data);
-                });
-            }
-
-            function loadItems() {
-                $.get(`/Inventories/GetItemsForInventory?inventoryId=${inventoryId}`, function(data) {
-                    itemsContainer.html(data);
-                });
-            }
-
-             function loadStats() {
-                $.get(`/Inventories/GetStatsForInventory?inventoryId=${inventoryId}`, function(data) {
-                    statsContainer.html(data);
-                });
-            }
-
-            loadComments();
-            loadItems();
-
-            $('#stats-tab').on('shown.bs.tab', function () {
-                loadStats();
-            });
-
-            if (@User.Identity.IsAuthenticated.ToString().ToLower()) {
-                commentForm.on('submit', function(e) {
-                    e.preventDefault();
-                    const token = $(this).find('input[name="__RequestVerificationToken"]').val();
-                    const formData = $(this).serialize();
-                    $.ajax({
-                        url: '/Comments/Create',
-                        type: 'POST',
-                        data: formData,
-                        headers: { 'RequestVerificationToken': token },
-                        success: function(newCommentHtml) {
-                            commentsContainer.append(newCommentHtml);
-                            contentTextarea.val('');
-                        },
-                        error: function() { alert('Error posting comment.'); }
-                    });
-                });
-
-                itemsContainer.on('click', '.like-btn', function() {
-                    const button = $(this);
-                    const itemId = button.data('item-id');
-                    $.ajax({
-                        url: '/api/Likes/ToggleLike',
-                        type: 'POST',
-                        contentType: 'application/json',
-                        data: JSON.stringify({ itemId: itemId }),
-                        success: function(response) {
-                            button.find('.like-count').text(response.count);
-                            if (response.liked) {
-                                button.removeClass('btn-outline-primary').addClass('btn-primary');
-                            } else {
-                                button.removeClass('btn-primary').addClass('btn-outline-primary');
-                            }
-                        },
-                        error: function() { alert('An error occurred.'); }
-                    });
-                });
-
-                setInterval(loadComments, 7000);
-            }
-
+        const inventoryId = @Model.Id;
+        const itemsContainer = $('#items-container');
+        const commentsContainer = $('#comments-container');
+        const statsContainer = $('#stats-container');
+        function loadItems() { $.get(`/Inventories/GetItemsForInventory?inventoryId=${inventoryId}`, data => itemsContainer.html(data)); }
+        function loadComments() { $.get(`/Comments/GetCommentsForInventory?inventoryId=${inventoryId}`, data => commentsContainer.html(data)); }
+        function loadStats() {
+        $.getJSON(`/Inventories/GetStatsForInventory?inventoryId=${inventoryId}`)
+        .done(function(data) {
+        statsContainer.empty();
+        let html = `<div class="row"><div class="col-12"><h4>Overall</h4><p><strong>Total Items:</strong> ${data.totalItems}</p><hr/></div></div>`;
+        if (data.numericStats && data.numericStats.length > 0) {
+        html += '<div class="row"><div class="col-12"><h4>Numeric Statistics</h4><table class="table table-sm"><thead><tr><th>Field</th><th>Avg</th><th>Min</th><th>Max</th></tr></thead><tbody>';
+        data.numericStats.forEach(s => { html += `<tr><td>${s.fieldName}</td><td>${s.average.toFixed(2)}</td><td>${s.min.toFixed(2)}</td><td>${s.max.toFixed(2)}</td></tr>`; });
+        html += '</tbody></table><hr/></div></div>';
+        }
+        if (data.stringStats && data.stringStats.length > 0) {
+        html += '<div class="row"><div class="col-12"><h4>String Field Statistics</h4></div></div><div class="row">';
+        data.stringStats.forEach((s, i) => {
+        html += `<div class="col-md-6 mb-4"><div style="position: relative; max-width: 400px; margin: auto; height: 300px;"><canvas id="chart${i}"></canvas></div></div>`;
+        });
+        html += '</div>';
+        }
+        statsContainer.html(html);
+        data.stringStats.forEach((s, i) => {
+        const ctx = document.getElementById(`chart${i}`).getContext('2d');
+        new Chart(ctx, {
+        type: 'pie', data: { labels: Object.keys(s.topValues), datasets: [{ data: Object.values(s.topValues), backgroundColor: ['#0d6efd', '#6c757d', '#198754', '#dc3545', '#ffc107'] }] },
+        options: { responsive: true, maintainAspectRatio: false }
+        });
+        });
+        })
+        .fail(function() { statsContainer.html('<p class="text-danger">Could not load statistics.</p>'); });
+        }
+        loadItems();
+        loadComments();
+        $('#stats-tab').one('shown.bs.tab', loadStats);
+        if (@(User.Identity?.IsAuthenticated == true ? "true" : "false")) {
+        $('#comment-form').on('submit', function(e) {
+        e.preventDefault();
+        $.ajax({
+        type: 'POST', url: '/Comments/Create',
+        data: $(this).serialize(),
+        headers: { 'RequestVerificationToken': $(this).find('input[name="__RequestVerificationToken"]').val() },
+        success: function(newCommentHtml) {
+        commentsContainer.append(newCommentHtml);
+        $('#comment-content').val('');
+        },
+        error: function() { alert('Error: Could not post comment.'); }
+        });
+        });
+        itemsContainer.on('click', '.like-btn', function() {
+        const button = $(this);
+        const itemId = button.data('item-id');
+        $.ajax({
+        type: 'POST', url: '/api/Likes/ToggleLike', contentType: 'application/json',
+        data: JSON.stringify({ itemId: itemId }),
+        success: function(res) {
+        button.find('.like-count').text(res.count);
+        button.toggleClass('btn-primary', res.liked).toggleClass('btn-outline-primary', !res.liked);
+        }
+        });
+        });
+        setInterval(loadComments, 10000);
+        }
         });
     </script>
 }

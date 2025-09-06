@@ -8,8 +8,6 @@
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     @await RenderSectionAsync("Styles", required: false)
     <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-
 </head>
 <body>
     <header>
@@ -23,9 +21,8 @@
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                         <li class="nav-item">
-@*                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
- *@                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">@Localizer["Home"]</a>
-
+                            @* <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+ *@ <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">@Localizer["Home"]</a>
                         </li>
                     </ul>
                     <div class="d-flex align-items-center ms-auto">
@@ -33,7 +30,6 @@
                             <input class="form-control me-2" type="search" placeholder="Search..." name="query">
                             <button class="btn btn-outline-success" type="submit">Search</button>
                         </form>
-
                         <div class="dropdown me-2">
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 <i class="bi bi-translate"></i>
@@ -43,10 +39,9 @@
                                 <li><a class="dropdown-item" href="#" data-culture="es-ES">Español</a></li>
                             </ul>
                         </div>
-
                         <button id="theme-toggle-btn" class="btn btn-secondary me-3"><i class="bi bi-moon-stars-fill"></i></button>
-                    <partial name="_LoginPartial" />
-                </div>
+                        <partial name="_LoginPartial" />
+                    </div>
                 </div>
             </div>
         </nav>
@@ -56,71 +51,63 @@
             @RenderBody()
         </main>
     </div>
-
     <footer class="border-top footer text-muted">
         <div class="container">
             &copy; 2025 - Inventory Management
         </div>
     </footer>
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
-
 <script>
     // --- Language Switcher Logic ---
     document.querySelectorAll('.dropdown-item[data-culture]').forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const culture = this.getAttribute('data-culture');
-            const returnUrl = window.location.pathname + window.location.search;
-
-            // Create a form and post it to set the culture cookie
-            const form = document.createElement('form');
-            form.method = 'POST';
-            form.action = '/Culture/SetCulture';
-
-            const cultureInput = document.createElement('input');
-            cultureInput.type = 'hidden';
-            cultureInput.name = 'culture';
-            cultureInput.value = culture;
-            form.appendChild(cultureInput);
-
-            const returnUrlInput = document.createElement('input');
-            returnUrlInput.type = 'hidden';
-            returnUrlInput.name = 'returnUrl';
-            returnUrlInput.value = returnUrl;
-            form.appendChild(returnUrlInput);
-
-            document.body.appendChild(form);
-            form.submit();
-        });
+    item.addEventListener('click', function(e) {
+    e.preventDefault();
+    const culture = this.getAttribute('data-culture');
+    const returnUrl = window.location.pathname + window.location.search;
+    // Create a form and post it to set the culture cookie
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/Culture/SetCulture';
+    const cultureInput = document.createElement('input');
+    cultureInput.type = 'hidden';
+    cultureInput.name = 'culture';
+    cultureInput.value = culture;
+    form.appendChild(cultureInput);
+    const returnUrlInput = document.createElement('input');
+    returnUrlInput.type = 'hidden';
+    returnUrlInput.name = 'returnUrl';
+    returnUrlInput.value = returnUrl;
+    form.appendChild(returnUrlInput);
+    document.body.appendChild(form);
+    form.submit();
     });
-
+    });
     // --- Theme Toggler Logic ---
     (function() {
-        const themeToggleBtn = document.getElementById('theme-toggle-btn');
-        const htmlEl = document.documentElement;
-
-        // Function to set the theme
-        function setTheme(theme) {
-            htmlEl.setAttribute('data-bs-theme', theme);
-            localStorage.setItem('theme', theme); // Use localStorage for theme
-            // Update icon
-            themeToggleBtn.innerHTML = theme === 'dark' ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-stars-fill"></i>';
-        }
-
-        // Event listener for the button
-        themeToggleBtn.addEventListener('click', () => {
-            const currentTheme = htmlEl.getAttribute('data-bs-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            setTheme(newTheme);
-        });
-
-        // Load the saved theme from localStorage on page load
-        const savedTheme = localStorage.getItem('theme') || 'light';
-        setTheme(savedTheme);
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    const htmlEl = document.documentElement;
+    // Function to set the theme
+    function setTheme(theme) {
+    htmlEl.setAttribute('data-bs-theme', theme);
+    localStorage.setItem('theme', theme); // Use localStorage for theme
+    // Update icon
+    themeToggleBtn.innerHTML = theme === 'dark' ? '<i class="bi bi-sun-fill"></i>' : '<i class="bi bi-moon-stars-fill"></i>';
+    }
+    // Event listener for the button
+    themeToggleBtn.addEventListener('click', () => {
+    const currentTheme = htmlEl.getAttribute('data-bs-theme');
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+    setTheme(newTheme);
+    });
+    // Load the saved theme from localStorage on page load
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
     })();
 </script>
