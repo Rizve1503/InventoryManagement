@@ -12,7 +12,7 @@
 </nav>
 
 <h1>@ViewData["Title"] for "@Model.InventoryTitle"</h1>
-<p class="text-muted">Define the data fields for items in this inventory. Enable a field and give it a name.</p>
+<p class="text-muted">Define the data fields for items in this inventory. Enable a field, give it a name, and set any required options.</p>
 <hr />
 
 @if (TempData["SuccessMessage"] != null)
@@ -25,24 +25,56 @@
 <form asp-action="Fields" asp-route-id="@Model.InventoryId" method="post">
     @Html.HiddenFor(m => m.InventoryId)
     @Html.HiddenFor(m => m.RowVersion)
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div asp-validation-summary="All" class="text-danger"></div>
 
     <div class="row">
         <!-- Single-Line Text Fields -->
-        <div class="col-md-4">
+        <div class="col-lg-4 col-md-6">
             <h5><i class="bi bi-fonts"></i> Single-Line Text</h5>
-            @for (int i = 1; i <= 3; i++)
-            {
-                <div class="card mb-3 p-3">
-                    <div class="form-check form-switch mb-2">
-                        <input class="form-check-input" type="checkbox" name="CustomString@(i)State" id="CustomString@(i)State" value="true" @(Model.GetType().GetProperty($"CustomString{i}State").GetValue(Model).ToString().ToLower() == "true" ? "checked" : "")>
-                        <label class="form-check-label" for="CustomString@(i)State">Enable Field</label>
-                    </div>
-                    <input type="text" name="CustomString@(i)Name" class="form-control" placeholder="Field Name (e.g., 'Model')" value="@Model.GetType().GetProperty($"CustomString{i}Name").GetValue(Model)">
-                </div>
-            }
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomString1State" class="form-check-input"><label asp-for="CustomString1State" class="form-check-label">Enable Field</label></div><input asp-for="CustomString1Name" class="form-control" placeholder="Field Name (e.g., 'Model')"></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomString2State" class="form-check-input"><label asp-for="CustomString2State" class="form-check-label">Enable Field</label></div><input asp-for="CustomString2Name" class="form-control" placeholder="Field Name (e.g., 'Serial #')"></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomString3State" class="form-check-input"><label asp-for="CustomString3State" class="form-check-label">Enable Field</label></div><input asp-for="CustomString3Name" class="form-control" placeholder="Field Name (e.g., 'Color')"></div>
         </div>
-        <!-- ... Repeat for Multi-Line, Numeric, Boolean, and Link fields using the same pattern ... -->
+
+        <!-- Multi-Line Text Fields -->
+        <div class="col-lg-4 col-md-6">
+            <h5><i class="bi bi-textarea-t"></i> Multi-Line Text</h5>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomText1State" class="form-check-input"><label asp-for="CustomText1State" class="form-check-label">Enable Field</label></div><input asp-for="CustomText1Name" class="form-control" placeholder="Field Name (e.g., 'Notes')"></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomText2State" class="form-check-input"><label asp-for="CustomText2State" class="form-check-label">Enable Field</label></div><input asp-for="CustomText2Name" class="form-control" placeholder="Field Name (e.g., 'Description')"></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomText3State" class="form-check-input"><label asp-for="CustomText3State" class="form-check-label">Enable Field</label></div><input asp-for="CustomText3Name" class="form-control" placeholder="Field Name (e.g., 'Comments')"></div>
+        </div>
+
+        <!-- Numeric Fields -->
+        <div class="col-lg-4 col-md-6">
+            <h5><i class="bi bi-hash"></i> Numeric</h5>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomNumeric1State" class="form-check-input"><label asp-for="CustomNumeric1State" class="form-check-label">Enable Field</label></div><input asp-for="CustomNumeric1Name" class="form-control" placeholder="Field Name (e.g., 'Price')"></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomNumeric2State" class="form-check-input"><label asp-for="CustomNumeric2State" class="form-check-label">Enable Field</label></div><input asp-for="CustomNumeric2Name" class="form-control" placeholder="Field Name (e.g., 'Quantity')"></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomNumeric3State" class="form-check-input"><label asp-for="CustomNumeric3State" class="form-check-label">Enable Field</label></div><input asp-for="CustomNumeric3Name" class="form-control" placeholder="Field Name (e.g., 'Weight')"></div>
+        </div>
+
+        <!-- Boolean Fields -->
+        <div class="col-lg-4 col-md-6">
+            <h5><i class="bi bi-check2-square"></i> Checkbox (Yes/No)</h5>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomBool1State" class="form-check-input"><label asp-for="CustomBool1State" class="form-check-label">Enable Field</label></div><input asp-for="CustomBool1Name" class="form-control" placeholder="Field Name (e.g., 'In Stock')"></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomBool2State" class="form-check-input"><label asp-for="CustomBool2State" class="form-check-label">Enable Field</label></div><input asp-for="CustomBool2Name" class="form-control" placeholder="Field Name (e.g., 'Requires Power')"></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomBool3State" class="form-check-input"><label asp-for="CustomBool3State" class="form-check-label">Enable Field</label></div><input asp-for="CustomBool3Name" class="form-control" placeholder="Field Name (e.g., 'Active')"></div>
+        </div>
+
+        <!-- Link Fields -->
+        <div class="col-lg-4 col-md-6">
+            <h5><i class="bi bi-link-45deg"></i> Document/Image Link</h5>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomLink1State" class="form-check-input"><label asp-for="CustomLink1State" class="form-check-label">Enable Field</label></div><input asp-for="CustomLink1Name" class="form-control" placeholder="Field Name (e.g., 'Manual URL')"></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomLink2State" class="form-check-input"><label asp-for="CustomLink2State" class="form-check-label">Enable Field</label></div><input asp-for="CustomLink2Name" class="form-control" placeholder="Field Name (e.g., 'Datasheet')"></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomLink3State" class="form-check-input"><label asp-for="CustomLink3State" class="form-check-label">Enable Field</label></div><input asp-for="CustomLink3Name" class="form-control" placeholder="Field Name (e.g., 'Project Site')"></div>
+        </div>
+
+        <!-- Select from List Fields -->
+        <div class="col-lg-4 col-md-6">
+            <h5><i class="bi bi-card-checklist"></i> Select from List</h5>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomSelect1State" class="form-check-input"><label asp-for="CustomSelect1State" class="form-check-label">Enable Field</label></div><input asp-for="CustomSelect1Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Status')"><textarea asp-for="CustomSelect1Options" class="form-control" placeholder="Options, comma-separated" rows="2"></textarea></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomSelect2State" class="form-check-input"><label asp-for="CustomSelect2State" class="form-check-label">Enable Field</label></div><input asp-for="CustomSelect2Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Condition')"><textarea asp-for="CustomSelect2Options" class="form-control" placeholder="New,Used,Refurbished" rows="2"></textarea></div>
+            <div class="card mb-3 p-3"><div class="form-check form-switch mb-2"><input asp-for="CustomSelect3State" class="form-check-input"><label asp-for="CustomSelect3State" class="form-check-label">Enable Field</label></div><input asp-for="CustomSelect3Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Location')"><textarea asp-for="CustomSelect3Options" class="form-control" placeholder="Building A,Building B,Warehouse" rows="2"></textarea></div>
+        </div>
     </div>
 
     <div class="form-group mt-4">

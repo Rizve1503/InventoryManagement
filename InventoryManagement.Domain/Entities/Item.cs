@@ -48,6 +48,11 @@ namespace InventoryManagement.Domain.Entities
         public string? CustomLink2Value { get; set; }
         public string? CustomLink3Value { get; set; }
 
+        // Select from List values
+        public string? CustomSelect1Value { get; set; }
+        public string? CustomSelect2Value { get; set; }
+        public string? CustomSelect3Value { get; set; }
+
         public virtual ICollection<Like> Likes { get; set; } = new List<Like>();
 
     }

@@ -31,6 +31,26 @@ namespace InventoryManagement.WebApp.Controllers
             }
 
             var userId = GetCurrentUserId();
+
+            var itemToLike = await _context.Items
+                            .Include(i => i.Inventory) // We need the parent inventory
+                            .FirstOrDefaultAsync(i => i.Id == model.ItemId);
+
+            if (itemToLike?.Inventory == null)
+            {
+                return NotFound();
+            }
+
+            // A user can like an item if its parent inventory is public.
+            if (!itemToLike.Inventory.IsPublic)
+            {
+                // If not public, only the creator can like.
+                if (itemToLike.Inventory.CreatorId != userId)
+                {
+                    return Forbid();
+                }
+            }
+
             var existingLike = await _context.Likes
                 .FirstOrDefaultAsync(l => l.ItemId == model.ItemId && l.UserId == userId);
 

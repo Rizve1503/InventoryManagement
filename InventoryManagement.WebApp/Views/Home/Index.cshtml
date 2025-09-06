@@ -16,7 +16,7 @@
         <div class="list-group mb-4">
             @foreach (var inventory in Model.LatestInventories)
             {
-                <a asp-controller="Items" asp-action="Index" asp-route-inventoryId="@inventory.Id" class="list-group-item list-group-item-action">
+                <a asp-controller="Inventories" asp-action="Details" asp-route-id="@inventory.Id" class="list-group-item list-group-item-action">
                     @inventory.Title
                 </a>
             }
@@ -26,7 +26,7 @@
         <div class="list-group">
             @foreach (var inventory in Model.TopInventories)
             {
-                <a asp-controller="Items" asp-action="Index" asp-route-inventoryId="@inventory.Id" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                <a asp-controller="Inventories" asp-action="Details" asp-route-id="@inventory.Id" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                     @inventory.Title
                     <span class="badge bg-primary rounded-pill">@inventory.Items.Count Items</span>
                 </a>

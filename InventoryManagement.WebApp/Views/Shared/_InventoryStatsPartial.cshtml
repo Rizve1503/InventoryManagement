@@ -1,0 +1,73 @@
+﻿@model InventoryStatsViewModel
+
+<div class="row">
+    <div class="col-md-12">
+        <h4>Overall</h4>
+        <p><strong>Total Items in Inventory:</strong> @Model.TotalItems</p>
+    </div>
+</div>
+<hr />
+
+@if (Model.NumericStats.Any())
+{
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <h4>Numeric Field Statistics</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Average</th>
+                        <th>Minimum</th>
+                        <th>Maximum</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var stat in Model.NumericStats)
+                    {
+                        <tr>
+                            <td>@stat.FieldName</td>
+                            <td>@stat.Average.ToString("N2")</td>
+                            <td>@stat.Min.ToString("N2")</td>
+                            <td>@stat.Max.ToString("N2")</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <hr />
+}
+
+@if (Model.StringStats.Any())
+{
+    <div class="row mt-3">
+        <div class="col-md-12">
+            <h4>String Field Statistics</h4>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Field Name</th>
+                        <th>Most Frequent Value</th>
+                        <th>Count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var stat in Model.StringStats)
+                    {
+                        <tr>
+                            <td>@stat.FieldName</td>
+                            <td>"@stat.MostFrequentValue"</td>
+                            <td>@stat.Frequency</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
+@if (!Model.NumericStats.Any() && !Model.StringStats.Any())
+{
+    <p class="text-muted mt-3">No statistics to display. This inventory may not have any items or configured numeric/string fields.</p>
+}

@@ -1,5 +1,4 @@
-﻿@using InventoryManagement.WebApp.ViewModels
-@model ItemViewModel
+﻿@model ItemViewModel
 
 @{
     ViewData["Title"] = $"Add New Item to {Model.Inventory?.Title}";
@@ -14,39 +13,171 @@
 
     <div class="row">
         <div class="col-md-8">
-            @{
-                // Helper function to render a form group
-                void RenderFormInput(string stateProperty, string nameProperty, string valueProperty, string inputType = "text")
-                {
-                    var state = (bool)(Model.Inventory?.GetType().GetProperty(stateProperty)?.GetValue(Model.Inventory) ?? false);
-                    if (state)
-                    {
-                        var name = (string)(Model.Inventory?.GetType().GetProperty(nameProperty)?.GetValue(Model.Inventory) ?? "");
-                        <div class="mb-3">
-                            <label class="form-label">@name</label>
-                            <input name="Item.@valueProperty" type="@inputType" class="form-control" />
-                        </div>
-                    }
-                }
+
+            @* --- Single-Line Text Fields --- *@
+            @if (Model.Inventory?.CustomString1State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomString1Name</label>
+                    <input name="Item.CustomString1Value" type="text" class="form-control" />
+                </div>
+            }
+            @if (Model.Inventory?.CustomString2State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomString2Name</label>
+                    <input name="Item.CustomString2Value" type="text" class="form-control" />
+                </div>
+            }
+            @if (Model.Inventory?.CustomString3State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomString3Name</label>
+                    <input name="Item.CustomString3Value" type="text" class="form-control" />
+                </div>
             }
 
-            @* Render String fields *@
-            @{ RenderFormInput("CustomString1State", "CustomString1Name", "CustomString1Value"); }
-            @{ RenderFormInput("CustomString2State", "CustomString2Name", "CustomString2Value"); }
-            @{ RenderFormInput("CustomString3State", "CustomString3Name", "CustomString3Value"); }
+            @* --- Multi-Line Text Fields --- *@
+            @if (Model.Inventory?.CustomText1State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomText1Name</label>
+                    <textarea name="Item.CustomText1Value" class="form-control" rows="3"></textarea>
+                </div>
+            }
+            @if (Model.Inventory?.CustomText2State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomText2Name</label>
+                    <textarea name="Item.CustomText2Value" class="form-control" rows="3"></textarea>
+                </div>
+            }
+            @if (Model.Inventory?.CustomText3State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomText3Name</label>
+                    <textarea name="Item.CustomText3Value" class="form-control" rows="3"></textarea>
+                </div>
+            }
 
-            @* Render Numeric fields *@
-            @{ RenderFormInput("CustomNumeric1State", "CustomNumeric1Name", "CustomNumeric1Value", "number"); }
-            @{ RenderFormInput("CustomNumeric2State", "CustomNumeric2Name", "CustomNumeric2Value", "number"); }
-            @{ RenderFormInput("CustomNumeric3State", "CustomNumeric3Name", "CustomNumeric3Value", "number"); }
+            @* --- Numeric Fields --- *@
+            @if (Model.Inventory?.CustomNumeric1State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomNumeric1Name</label>
+                    <input name="Item.CustomNumeric1Value" type="number" class="form-control" />
+                </div>
+            }
+            @if (Model.Inventory?.CustomNumeric2State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomNumeric2Name</label>
+                    <input name="Item.CustomNumeric2Value" type="number" class="form-control" />
+                </div>
+            }
+            @if (Model.Inventory?.CustomNumeric3State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomNumeric3Name</label>
+                    <input name="Item.CustomNumeric3Value" type="number" class="form-control" />
+                </div>
+            }
 
-            @* ToDo: Render other field types (Text, Bool, Link) using similar logic *@
+            @* --- Checkbox (Boolean) Fields --- *@
+            @if (Model.Inventory?.CustomBool1State == true)
+            {
+                <div class="mb-3 form-check">
+                    <input name="Item.CustomBool1Value" type="checkbox" class="form-check-input" value="true" />
+                    <label class="form-check-label">@Model.Inventory.CustomBool1Name</label>
+                </div>
+            }
+            @if (Model.Inventory?.CustomBool2State == true)
+            {
+                <div class="mb-3 form-check">
+                    <input name="Item.CustomBool2Value" type="checkbox" class="form-check-input" value="true" />
+                    <label class="form-check-label">@Model.Inventory.CustomBool2Name</label>
+                </div>
+            }
+            @if (Model.Inventory?.CustomBool3State == true)
+            {
+                <div class="mb-3 form-check">
+                    <input name="Item.CustomBool3Value" type="checkbox" class="form-check-input" value="true" />
+                    <label class="form-check-label">@Model.Inventory.CustomBool3Name</label>
+                </div>
+            }
+
+            @* --- Document/Image Link Fields --- *@
+            @if (Model.Inventory?.CustomLink1State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomLink1Name</label>
+                    <input name="Item.CustomLink1Value" type="url" class="form-control" />
+                </div>
+            }
+            @if (Model.Inventory?.CustomLink2State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomLink2Name</label>
+                    <input name="Item.CustomLink2Value" type="url" class="form-control" />
+                </div>
+            }
+            @if (Model.Inventory?.CustomLink3State == true)
+            {
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomLink3Name</label>
+                    <input name="Item.CustomLink3Value" type="url" class="form-control" />
+                </div>
+            }
+
+            @* --- Select from List Fields --- *@
+            @if (Model.Inventory?.CustomSelect1State == true)
+            {
+                var options = Model.Inventory.CustomSelect1Options.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(o => o.Trim());
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomSelect1Name</label>
+                    <select name="Item.CustomSelect1Value" class="form-select">
+                        <option value="">-- Select --</option>
+                        @foreach (var option in options)
+                        {
+                            <option value="@option">@option</option>
+                        }
+                    </select>
+                </div>
+            }
+            @if (Model.Inventory?.CustomSelect2State == true)
+            {
+                var options = Model.Inventory.CustomSelect2Options.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(o => o.Trim());
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomSelect2Name</label>
+                    <select name="Item.CustomSelect2Value" class="form-select">
+                        <option value="">-- Select --</option>
+                        @foreach (var option in options)
+                        {
+                            <option value="@option">@option</option>
+                        }
+                    </select>
+                </div>
+            }
+            @if (Model.Inventory?.CustomSelect3State == true)
+            {
+                var options = Model.Inventory.CustomSelect3Options.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(o => o.Trim());
+                <div class="mb-3">
+                    <label class="form-label">@Model.Inventory.CustomSelect3Name</label>
+                    <select name="Item.CustomSelect3Value" class="form-select">
+                        <option value="">-- Select --</option>
+                        @foreach (var option in options)
+                        {
+                            <option value="@option">@option</option>
+                        }
+                    </select>
+                </div>
+            }
 
         </div>
     </div>
 
     <div class="form-group mt-3">
         <input type="submit" value="Create Item" class="btn btn-primary" />
-        <a asp-action="Index" asp-route-inventoryId="@Model.InventoryId" class="btn btn-secondary">Cancel</a>
+        <a asp-controller="Inventories" asp-action="Details" asp-route-id="@Model.InventoryId" class="btn btn-secondary">Cancel</a>
     </div>
 </form>

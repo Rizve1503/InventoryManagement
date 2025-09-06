@@ -17,13 +17,14 @@
         <li class="nav-item" role="presentation">
             <button class="nav-link" id="discussion-tab" data-bs-toggle="tab" data-bs-target="#discussion" type="button" role="tab">Discussion</button>
         </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab">Stats</button>
+        </li>
     </ul>
     <div class="tab-content" id="inventoryTabContent">
         <div class="tab-pane fade show active" id="items" role="tabpanel">
             <div class="p-3" id="items-container">
-                <div class="text-center">
-                    <div class="spinner-border"></div>
-                </div>
+                <div class="text-center"><div class="spinner-border"></div></div>
             </div>
         </div>
         <div class="tab-pane fade" id="discussion" role="tabpanel">
@@ -32,15 +33,33 @@
                     <div class="text-center"><div class="spinner-border"></div></div>
                 </div>
 
-                <form id="comment-form" asp-controller="Comments" asp-action="Create" method="post">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" name="InventoryId" value="@Model.Id" />
-                    <div class="mb-3">
-                        <label for="comment-content" class="form-label">Leave a comment</label>
-                        <textarea id="comment-content" name="Content" class="form-control" rows="3" required></textarea>
+                @if (User.Identity.IsAuthenticated)
+                {
+                    <form id="comment-form" asp-controller="Comments" asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="InventoryId" value="@Model.Id" />
+                        <div class="mb-3">
+                            <label for="comment-content" class="form-label">Leave a comment</label>
+                            <textarea id="comment-content" name="Content" class="form-control" rows="3" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Post Comment</button>
+                    </form>
+                }
+                else
+                {
+                    <div class="alert alert-info">
+                        <a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Sign in</a> to post a comment.
                     </div>
-                    <button type="submit" class="btn btn-primary">Post Comment</button>
-                </form>
+                }
+            </div>
+        </div>
+        <div class="tab-pane fade" id="stats" role="tabpanel">
+            <div class="p-3" id="stats-container">
+                <div class="text-center">
+                    <div class="spinner-border">
+                    
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -54,78 +73,74 @@
             const commentForm = $('#comment-form');
             const contentTextarea = $('#comment-content');
             const itemsContainer = $('#items-container');
+            const statsContainer = $('#stats-container');
 
-            // Function to load comments
             function loadComments() {
                 $.get(`/Comments/GetCommentsForInventory?inventoryId=${inventoryId}`, function(data) {
                     commentsContainer.html(data);
                 });
             }
 
-            // Handle comment form submission
-            commentForm.on('submit', function(e) {
-                e.preventDefault();
-
-                const token = $(this).find('input[name="__RequestVerificationToken"]').val();
-                const formData = $(this).serialize();
-
-                $.ajax({
-                    url: '/Comments/Create',
-                    type: 'POST',
-                    data: formData,
-                    headers: {
-                        'RequestVerificationToken': token
-                    },
-                    success: function(newCommentHtml) {
-                        commentsContainer.append(newCommentHtml);
-                        contentTextarea.val(''); // Clear textarea
-                    },
-                    error: function() {
-                        alert('Error posting comment.');
-                    }
-                });
-            });
-
-            // Initial load
-            loadComments();
-
-            // Polling for near real-time updates every 7 seconds
-            setInterval(loadComments, 7000);
-
-            // Function to load items
             function loadItems() {
                 $.get(`/Inventories/GetItemsForInventory?inventoryId=${inventoryId}`, function(data) {
                     itemsContainer.html(data);
                 });
             }
 
-            // Initial load of items when the page is ready
+             function loadStats() {
+                $.get(`/Inventories/GetStatsForInventory?inventoryId=${inventoryId}`, function(data) {
+                    statsContainer.html(data);
+                });
+            }
+
+            loadComments();
             loadItems();
 
-            // Handle clicks on the like button
-            itemsContainer.on('click', '.like-btn', function() {
-                const button = $(this);
-                const itemId = button.data('item-id');
-                const likeCountSpan = button.find('.like-count');
-
-                $.ajax({
-                    url: '/api/Likes/ToggleLike',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ itemId: itemId }),
-                    success: function(response) {
-                        likeCountSpan.text(response.count);
-                        if (response.liked) {
-                            button.removeClass('btn-outline-primary').addClass('btn-primary');
-                        } else {
-                            button.removeClass('btn-primary').addClass('btn-outline-primary');
-                        }
-                    },
-                    error: function() {
-                        alert('An error occurred.');
-                    }
-                });
+            $('#stats-tab').on('shown.bs.tab', function () {
+                loadStats();
             });
+
+            if (@User.Identity.IsAuthenticated.ToString().ToLower()) {
+                commentForm.on('submit', function(e) {
+                    e.preventDefault();
+                    const token = $(this).find('input[name="__RequestVerificationToken"]').val();
+                    const formData = $(this).serialize();
+                    $.ajax({
+                        url: '/Comments/Create',
+                        type: 'POST',
+                        data: formData,
+                        headers: { 'RequestVerificationToken': token },
+                        success: function(newCommentHtml) {
+                            commentsContainer.append(newCommentHtml);
+                            contentTextarea.val('');
+                        },
+                        error: function() { alert('Error posting comment.'); }
+                    });
+                });
+
+                itemsContainer.on('click', '.like-btn', function() {
+                    const button = $(this);
+                    const itemId = button.data('item-id');
+                    $.ajax({
+                        url: '/api/Likes/ToggleLike',
+                        type: 'POST',
+                        contentType: 'application/json',
+                        data: JSON.stringify({ itemId: itemId }),
+                        success: function(response) {
+                            button.find('.like-count').text(response.count);
+                            if (response.liked) {
+                                button.removeClass('btn-outline-primary').addClass('btn-primary');
+                            } else {
+                                button.removeClass('btn-primary').addClass('btn-outline-primary');
+                            }
+                        },
+                        error: function() { alert('An error occurred.'); }
+                    });
+                });
+
+                setInterval(loadComments, 7000);
+            }
+
         });
     </script>
 }

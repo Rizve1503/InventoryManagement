@@ -47,9 +47,6 @@ namespace InventoryManagement.WebApp.Controllers
             return View(userInventories);
         }
 
-        // NEW ACTION: This action will be called by AJAX to get subsequent pages
-        // Inside the InventoriesController, find the GetInventoriesPage action.
-
         [HttpGet]
         public async Task<IActionResult> GetInventoriesPage(int page = 2, string viewType = "list")
         {
@@ -144,22 +141,6 @@ namespace InventoryManagement.WebApp.Controllers
             return View(model);
         }
 
-        [AllowAnonymous]
-        // GET: /Inventories/Details/5
-        public async Task<IActionResult> Details(int id)
-        {
-            var inventory = await _context.Inventories
-                .Include(i => i.Creator)
-                .FirstOrDefaultAsync(i => i.Id == id);
-
-            if (inventory == null)
-            {
-                return NotFound();
-            }
-
-            // Pass the inventory to the view
-            return View(inventory);
-        }
         // POST: /Inventories/Edit/5 (No changes to this action)
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -201,12 +182,13 @@ namespace InventoryManagement.WebApp.Controllers
 
             if (model.ImageFile != null && model.ImageFile.Length > 0)
             {
-                // Delete the old image if it exists
+                // 1. Delete the old image from Cloudinary if it exists
                 if (!string.IsNullOrEmpty(inventoryToUpdate.ImageUrl))
                 {
                     _fileStorageService.DeleteFile(inventoryToUpdate.ImageUrl);
                 }
-                // Save the new image and store its unique name in the database
+
+                // 2. Save the new image to Cloudinary and get the new URL
                 inventoryToUpdate.ImageUrl = await _fileStorageService.SaveFileAsync(model.ImageFile);
             }
 
@@ -239,6 +221,23 @@ namespace InventoryManagement.WebApp.Controllers
             return View(model);
         }
 
+
+        [AllowAnonymous]
+        // GET: /Inventories/Details/5
+        public async Task<IActionResult> Details(int id)
+        {
+            var inventory = await _context.Inventories
+                .Include(i => i.Creator)
+                .FirstOrDefaultAsync(i => i.Id == id);
+
+            if (inventory == null)
+            {
+                return NotFound();
+            }
+
+            // Pass the inventory to the view
+            return View(inventory);
+        }
         private int GetCurrentUserId()
         {
             var userIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -246,7 +245,8 @@ namespace InventoryManagement.WebApp.Controllers
             {
                 return userId;
             }
-            throw new InvalidOperationException("User ID is not available in the claims.");
+            // throw new InvalidOperationException("User ID is not available in the claims.");
+            return 0; // Return a default value (e.g., 0) instead of null for non-nullable int
         }
 
 
@@ -256,7 +256,9 @@ namespace InventoryManagement.WebApp.Controllers
         {
             if (id == null) return NotFound();
 
-            var inventory = await _context.Inventories.FindAsync(id);
+            var inventory = await _context.Inventories
+                            .AsNoTracking() 
+                            .FirstOrDefaultAsync(i => i.Id == id);
             if (inventory == null) return NotFound();
 
             // Authorization Check
@@ -267,15 +269,142 @@ namespace InventoryManagement.WebApp.Controllers
                 InventoryId = inventory.Id,
                 InventoryTitle = inventory.Title,
                 RowVersion = inventory.RowVersion,
-                // Map all 15 field states and names from entity to viewmodel
+
+                // Single-line text fields
                 CustomString1State = inventory.CustomString1State,
                 CustomString1Name = inventory.CustomString1Name,
-                // ... (repeat for all other custom fields) ...
+                CustomString2State = inventory.CustomString2State,
+                CustomString2Name = inventory.CustomString2Name,
+                CustomString3State = inventory.CustomString3State,
+                CustomString3Name = inventory.CustomString3Name,
+
+                // Multi-line text fields
+                CustomText1State = inventory.CustomText1State,
+                CustomText1Name = inventory.CustomText1Name,
+                CustomText2State = inventory.CustomText2State,
+                CustomText2Name = inventory.CustomText2Name,
+                CustomText3State = inventory.CustomText3State,
+                CustomText3Name = inventory.CustomText3Name,
+
+                // Numeric fields
+                CustomNumeric1State = inventory.CustomNumeric1State,
+                CustomNumeric1Name = inventory.CustomNumeric1Name,
+                CustomNumeric2State = inventory.CustomNumeric2State,
+                CustomNumeric2Name = inventory.CustomNumeric2Name,
+                CustomNumeric3State = inventory.CustomNumeric3State,
+                CustomNumeric3Name = inventory.CustomNumeric3Name,
+
+                // Boolean (checkbox) fields
+                CustomBool1State = inventory.CustomBool1State,
+                CustomBool1Name = inventory.CustomBool1Name,
+                CustomBool2State = inventory.CustomBool2State,
+                CustomBool2Name = inventory.CustomBool2Name,
+                CustomBool3State = inventory.CustomBool3State,
+                CustomBool3Name = inventory.CustomBool3Name,
+
+                // Document/Image Link fields
+                CustomLink1State = inventory.CustomLink1State,
+                CustomLink1Name = inventory.CustomLink1Name,
+                CustomLink2State = inventory.CustomLink2State,
+                CustomLink2Name = inventory.CustomLink2Name,
                 CustomLink3State = inventory.CustomLink3State,
-                CustomLink3Name = inventory.CustomLink3Name
+                CustomLink3Name = inventory.CustomLink3Name,
+
+                // Select from List fields
+                CustomSelect1State = inventory.CustomSelect1State,
+                CustomSelect1Name = inventory.CustomSelect1Name,
+                CustomSelect1Options = inventory.CustomSelect1Options,
+                CustomSelect2State = inventory.CustomSelect2State,
+                CustomSelect2Name = inventory.CustomSelect2Name,
+                CustomSelect2Options = inventory.CustomSelect2Options,
+                CustomSelect3State = inventory.CustomSelect3State,
+                CustomSelect3Name = inventory.CustomSelect3Name,
+                CustomSelect3Options = inventory.CustomSelect3Options
             };
 
             return View(model);
+        }
+
+
+        [AllowAnonymous] // Allow everyone to view stats
+        [HttpGet]
+        public async Task<IActionResult> GetStatsForInventory(int inventoryId)
+        {
+            var inventory = await _context.Inventories
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.Id == inventoryId);
+
+            if (inventory == null) return NotFound();
+
+            var items = await _context.Items
+                .AsNoTracking()
+                .Where(i => i.InventoryId == inventoryId)
+                .ToListAsync();
+
+            var model = new InventoryStatsViewModel
+            {
+                TotalItems = items.Count
+            };
+
+            if (items.Any())
+            {
+                // --- Calculate Numeric Stats ---
+                if (inventory.CustomNumeric1State)
+                {
+                    var values = items.Select(i => i.CustomNumeric1Value).Where(v => v.HasValue).Select(v => v.Value);
+                    if (values.Any())
+                    {
+                        model.NumericStats.Add(new NumericStat { FieldName = inventory.CustomNumeric1Name, Average = values.Average(), Min = values.Min(), Max = values.Max() });
+                    }
+                }
+                if (inventory.CustomNumeric2State)
+                {
+                    var values = items.Select(i => i.CustomNumeric2Value).Where(v => v.HasValue).Select(v => v.Value);
+                    if (values.Any())
+                    {
+                        model.NumericStats.Add(new NumericStat { FieldName = inventory.CustomNumeric2Name, Average = values.Average(), Min = values.Min(), Max = values.Max() });
+                    }
+                }
+                if (inventory.CustomNumeric3State)
+                {
+                    var values = items.Select(i => i.CustomNumeric3Value).Where(v => v.HasValue).Select(v => v.Value);
+                    if (values.Any())
+                    {
+                        model.NumericStats.Add(new NumericStat { FieldName = inventory.CustomNumeric3Name, Average = values.Average(), Min = values.Min(), Max = values.Max() });
+                    }
+                }
+
+                // --- Calculate String Stats ---
+                if (inventory.CustomString1State)
+                {
+                    var stat = items.Select(i => i.CustomString1Value).Where(s => !string.IsNullOrEmpty(s))
+                        .GroupBy(s => s)
+                        .OrderByDescending(g => g.Count())
+                        .Select(g => new StringStat { FieldName = inventory.CustomString1Name, MostFrequentValue = g.Key, Frequency = g.Count() })
+                        .FirstOrDefault();
+                    if (stat != null) model.StringStats.Add(stat);
+                }
+                if (inventory.CustomString2State)
+                {
+                    var stat = items.Select(i => i.CustomString2Value).Where(s => !string.IsNullOrEmpty(s))
+                        .GroupBy(s => s)
+                        .OrderByDescending(g => g.Count())
+                        .Select(g => new StringStat { FieldName = inventory.CustomString2Name, MostFrequentValue = g.Key, Frequency = g.Count() })
+                        .FirstOrDefault();
+                    if (stat != null) model.StringStats.Add(stat);
+                }
+                if (inventory.CustomString3State)
+                {
+                    var stat = items.Select(i => i.CustomString3Value).Where(s => !string.IsNullOrEmpty(s))
+                        .GroupBy(s => s)
+                        .OrderByDescending(g => g.Count())
+                        .Select(g => new StringStat { FieldName = inventory.CustomString3Name, MostFrequentValue = g.Key, Frequency = g.Count() })
+                        .FirstOrDefault();
+                    if (stat != null) model.StringStats.Add(stat);
+                }
+            }
+
+            return PartialView("_InventoryStatsPartial", model);
         }
 
         // POST: /Inventories/Fields/5
@@ -283,38 +412,104 @@ namespace InventoryManagement.WebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Fields(int id, CustomFieldsViewModel model)
         {
-            if (id != model.InventoryId) return NotFound();
+            if (id != model.InventoryId)
+            {
+                return NotFound();
+            }
 
-            if (!ModelState.IsValid) return View(model);
+            // We must load the entity fresh from the database to ensure we have the latest version to update.
+            var inventoryToUpdate = await _context.Inventories.FirstOrDefaultAsync(i => i.Id == id);
 
-            var inventoryToUpdate = await _context.Inventories.FindAsync(id);
-            if (inventoryToUpdate == null) return NotFound();
+            if (inventoryToUpdate == null)
+            {
+                // This can happen if another user deleted the inventory.
+                TempData["ErrorMessage"] = "The inventory you tried to edit was deleted.";
+                return RedirectToAction(nameof(Index));
+            }
 
             // Authorization Check
-            if (inventoryToUpdate.CreatorId != GetCurrentUserId()) return Forbid();
+            if (inventoryToUpdate.CreatorId != GetCurrentUserId())
+            {
+                return Forbid();
+            }
 
-            _context.Entry(inventoryToUpdate).Property("RowVersion").OriginalValue = model.RowVersion;
+            if (!ModelState.IsValid)
+            {
+                model.InventoryTitle = inventoryToUpdate.Title; // Repopulate title on error
+                return View(model);
+            }
 
-            // Map all 15 field states and names from viewmodel back to entity
+            // --- Start of Complete and Correct Property Mapping ---
+
+            // Single-line text fields
             inventoryToUpdate.CustomString1State = model.CustomString1State;
             inventoryToUpdate.CustomString1Name = model.CustomString1State ? model.CustomString1Name : string.Empty;
-            // ... (repeat for all other custom fields, ensuring Name is cleared if State is false) ...
+            inventoryToUpdate.CustomString2State = model.CustomString2State;
+            inventoryToUpdate.CustomString2Name = model.CustomString2State ? model.CustomString2Name : string.Empty;
+            inventoryToUpdate.CustomString3State = model.CustomString3State;
+            inventoryToUpdate.CustomString3Name = model.CustomString3State ? model.CustomString3Name : string.Empty;
+
+            // Multi-line text fields
+            inventoryToUpdate.CustomText1State = model.CustomText1State;
+            inventoryToUpdate.CustomText1Name = model.CustomText1State ? model.CustomText1Name : string.Empty;
+            inventoryToUpdate.CustomText2State = model.CustomText2State;
+            inventoryToUpdate.CustomText2Name = model.CustomText2State ? model.CustomText2Name : string.Empty;
+            inventoryToUpdate.CustomText3State = model.CustomText3State;
+            inventoryToUpdate.CustomText3Name = model.CustomText3State ? model.CustomText3Name : string.Empty;
+
+            // Numeric fields
+            inventoryToUpdate.CustomNumeric1State = model.CustomNumeric1State;
+            inventoryToUpdate.CustomNumeric1Name = model.CustomNumeric1State ? model.CustomNumeric1Name : string.Empty;
+            inventoryToUpdate.CustomNumeric2State = model.CustomNumeric2State;
+            inventoryToUpdate.CustomNumeric2Name = model.CustomNumeric2State ? model.CustomNumeric2Name : string.Empty;
+            inventoryToUpdate.CustomNumeric3State = model.CustomNumeric3State;
+            inventoryToUpdate.CustomNumeric3Name = model.CustomNumeric3State ? model.CustomNumeric3Name : string.Empty;
+
+            // Boolean (checkbox) fields
+            inventoryToUpdate.CustomBool1State = model.CustomBool1State;
+            inventoryToUpdate.CustomBool1Name = model.CustomBool1State ? model.CustomBool1Name : string.Empty;
+            inventoryToUpdate.CustomBool2State = model.CustomBool2State;
+            inventoryToUpdate.CustomBool2Name = model.CustomBool2State ? model.CustomBool2Name : string.Empty;
+            inventoryToUpdate.CustomBool3State = model.CustomBool3State;
+            inventoryToUpdate.CustomBool3Name = model.CustomBool3State ? model.CustomBool3Name : string.Empty;
+
+            // Document/Image Link fields
+            inventoryToUpdate.CustomLink1State = model.CustomLink1State;
+            inventoryToUpdate.CustomLink1Name = model.CustomLink1State ? model.CustomLink1Name : string.Empty;
+            inventoryToUpdate.CustomLink2State = model.CustomLink2State;
+            inventoryToUpdate.CustomLink2Name = model.CustomLink2State ? model.CustomLink2Name : string.Empty;
             inventoryToUpdate.CustomLink3State = model.CustomLink3State;
             inventoryToUpdate.CustomLink3Name = model.CustomLink3State ? model.CustomLink3Name : string.Empty;
+
+            // Select from List fields
+            inventoryToUpdate.CustomSelect1State = model.CustomSelect1State;
+            inventoryToUpdate.CustomSelect1Name = model.CustomSelect1State ? model.CustomSelect1Name : string.Empty;
+            inventoryToUpdate.CustomSelect1Options = model.CustomSelect1State ? (model.CustomSelect1Options ?? string.Empty) : string.Empty;
+            inventoryToUpdate.CustomSelect2State = model.CustomSelect2State;
+            inventoryToUpdate.CustomSelect2Name = model.CustomSelect2State ? model.CustomSelect2Name : string.Empty;
+            inventoryToUpdate.CustomSelect2Options = model.CustomSelect2State ? (model.CustomSelect2Options ?? string.Empty) : string.Empty;
+            inventoryToUpdate.CustomSelect3State = model.CustomSelect3State;
+            inventoryToUpdate.CustomSelect3Name = model.CustomSelect3State ? model.CustomSelect3Name : string.Empty;
+            inventoryToUpdate.CustomSelect3Options = model.CustomSelect3State ? (model.CustomSelect3Options ?? string.Empty) : string.Empty;
+
+            // --- End of Complete Property Mapping ---
 
             inventoryToUpdate.UpdatedAt = DateTime.UtcNow;
 
             try
             {
+                // Tell EF that the entity has been modified.
+                _context.Inventories.Update(inventoryToUpdate);
                 await _context.SaveChangesAsync();
-                // Add a success message to TempData
+
                 TempData["SuccessMessage"] = "Custom fields saved successfully!";
                 return RedirectToAction(nameof(Fields), new { id = model.InventoryId });
             }
             catch (DbUpdateConcurrencyException)
             {
-                // Handle concurrency error similar to the Edit action
+                // This error is now less likely but is good practice to keep.
                 ModelState.AddModelError(string.Empty, "These settings were modified by another user. Please reload and try again.");
+                model.InventoryTitle = inventoryToUpdate.Title;
                 return View(model);
             }
         }
@@ -451,6 +646,7 @@ namespace InventoryManagement.WebApp.Controllers
             return Json(new List<string>());
         }
         // GET: /Inventories/GetItemsForInventory?inventoryId=5
+        [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetItemsForInventory(int inventoryId)
         {

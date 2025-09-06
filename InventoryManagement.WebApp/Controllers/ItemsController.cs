@@ -102,8 +102,11 @@ namespace InventoryManagement.WebApp.Controllers
                     return BadRequest("Item data is missing.");
                 }
 
-                // Generate Custom ID if format is defined
-                itemToCreate.CustomId = await _customIdService.GenerateIdAsync(inventory);
+                // Only generate a Custom ID if the inventory has a format defined.
+                if (!string.IsNullOrEmpty(inventory.CustomIdFormatJson))
+                {
+                    itemToCreate.CustomId = await _customIdService.GenerateIdAsync(inventory);
+                }
 
                 itemToCreate.InventoryId = model.InventoryId;
                 itemToCreate.CreatedAt = DateTime.UtcNow;

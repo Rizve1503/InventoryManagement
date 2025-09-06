@@ -20,7 +20,7 @@ else
         <div class="list-group">
             @foreach (var inventory in Model.FoundInventories)
             {
-                <a asp-controller="Items" asp-action="Index" asp-route-inventoryId="@inventory.Id" class="list-group-item list-group-item-action">
+                <a asp-controller="Inventories" asp-action="Details" asp-route-id="@inventory.Id" class="list-group-item list-group-item-action">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="mb-1">@inventory.Title</h5>
                         <small>@inventory.CreatedAt.ToShortDateString()</small>
@@ -38,7 +38,7 @@ else
         <div class="list-group">
             @foreach (var result in Model.FoundItems)
             {
-                <a asp-controller="Items" asp-action="Index" asp-route-inventoryId="@result.InventoryId" class="list-group-item list-group-item-action">
+                <a asp-controller="Inventories" asp-action="Details" asp-route-id="@result.InventoryId" class="list-group-item list-group-item-action">
                     <h5 class="mb-1">Item in "@result.InventoryTitle"</h5>
                     <small class="text-muted">An item's content matched your search. Click to view the full inventory.</small>
                     @* In a more advanced view, we could show which field matched *@

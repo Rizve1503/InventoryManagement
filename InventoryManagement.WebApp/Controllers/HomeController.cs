@@ -23,12 +23,14 @@ namespace InventoryManagement.WebApp.Controllers
             {
                 // Get the 5 most recently created inventories
                 LatestInventories = await _context.Inventories
+                    .Where(i => i.IsPublic)
                     .OrderByDescending(i => i.CreatedAt)
                     .Take(5)
                     .ToListAsync(),
 
                 // Get the top 5 inventories based on the number of items they contain
                 TopInventories = await _context.Inventories
+                    .Where(i => i.IsPublic)
                     .OrderByDescending(i => i.Items.Count)
                     .Take(5)
                     .ToListAsync(),

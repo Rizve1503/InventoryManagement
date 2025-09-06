@@ -7,16 +7,23 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
+
 
 namespace InventoryManagement.Infrastructure.Services
 {
     public class CustomIdService : ICustomIdService
     {
         private readonly ApplicationDbContext _context;
+        private readonly JsonSerializerOptions _jsonOptions;
 
         public CustomIdService(ApplicationDbContext context)
         {
             _context = context;
+            _jsonOptions = new JsonSerializerOptions
+            {
+                Converters = { new JsonStringEnumConverter() }
+            };
         }
 
         public async Task<string> GenerateIdAsync(Inventory inventory)
@@ -36,7 +43,8 @@ namespace InventoryManagement.Infrastructure.Services
                 return string.Empty; // No format defined
             }
 
-            var config = JsonSerializer.Deserialize<CustomIdConfiguration>(inventory.CustomIdFormatJson);
+            var config = JsonSerializer.Deserialize<CustomIdConfiguration>(inventory.CustomIdFormatJson, _jsonOptions);
+
             if (config == null || !config.Elements.Any())
             {
                 return string.Empty;

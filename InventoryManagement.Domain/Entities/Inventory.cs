@@ -68,6 +68,19 @@ namespace InventoryManagement.Domain.Entities
         public string CustomLink3Name { get; set; } = string.Empty;
         public string? CustomIdFormatJson { get; set; }
 
+        // Select from List fields
+        public bool CustomSelect1State { get; set; }
+        public string CustomSelect1Name { get; set; } = string.Empty;
+        public string CustomSelect1Options { get; set; } = string.Empty; // Comma-separated options
+
+        public bool CustomSelect2State { get; set; }
+        public string CustomSelect2Name { get; set; } = string.Empty;
+        public string CustomSelect2Options { get; set; } = string.Empty;
+
+        public bool CustomSelect3State { get; set; }
+        public string CustomSelect3Name { get; set; } = string.Empty;
+        public string CustomSelect3Options { get; set; } = string.Empty;
+
         public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 

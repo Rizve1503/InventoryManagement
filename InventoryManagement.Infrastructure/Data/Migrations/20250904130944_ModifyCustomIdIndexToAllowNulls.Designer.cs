@@ -4,16 +4,19 @@ using InventoryManagement.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace InventoryManagement.Infrastructure.Migrations
+namespace InventoryManagement.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250904130944_ModifyCustomIdIndexToAllowNulls")]
+    partial class ModifyCustomIdIndexToAllowNulls
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -133,39 +136,6 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Property<bool>("CustomNumeric3State")
                         .HasColumnType("bit");
 
-                    b.Property<string>("CustomSelect1Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomSelect1Options")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("CustomSelect1State")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("CustomSelect2Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomSelect2Options")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("CustomSelect2State")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("CustomSelect3Name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomSelect3Options")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("CustomSelect3State")
-                        .HasColumnType("bit");
-
                     b.Property<string>("CustomString1Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -282,15 +252,6 @@ namespace InventoryManagement.Infrastructure.Migrations
                     b.Property<decimal?>("CustomNumeric3Value")
                         .HasPrecision(18, 4)
                         .HasColumnType("decimal(18,4)");
-
-                    b.Property<string>("CustomSelect1Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomSelect2Value")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("CustomSelect3Value")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("CustomString1Value")
                         .HasColumnType("nvarchar(max)");
