@@ -8,32 +8,44 @@
 <hr />
 
 <form asp-action="Create" method="post">
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div asp-validation-summary="All" class="text-danger"></div>
     <input type="hidden" asp-for="InventoryId" />
 
     <div class="row">
         <div class="col-md-8">
 
-            @* --- Single-Line Text Fields --- *@
+            @* --- Single-Line Text Fields with Validation --- *@
             @if (Model.Inventory?.CustomString1State == true)
             {
                 <div class="mb-3">
                     <label class="form-label">@Model.Inventory.CustomString1Name</label>
-                    <input name="Item.CustomString1Value" type="text" class="form-control" />
+                    <input name="Item.CustomString1Value" type="text" class="form-control"
+                           maxlength="@Model.Inventory.CustomString1MaxLength"
+                           pattern="@Model.Inventory.CustomString1Regex"
+                           title="@(string.IsNullOrEmpty(Model.Inventory.CustomString1Regex) ? "" : $"Must match the format: {Model.Inventory.CustomString1Regex}")" />
+                    <span asp-validation-for="Item.CustomString1Value" class="text-danger"></span>
                 </div>
             }
             @if (Model.Inventory?.CustomString2State == true)
             {
                 <div class="mb-3">
                     <label class="form-label">@Model.Inventory.CustomString2Name</label>
-                    <input name="Item.CustomString2Value" type="text" class="form-control" />
+                    <input name="Item.CustomString2Value" type="text" class="form-control"
+                           maxlength="@Model.Inventory.CustomString2MaxLength"
+                           pattern="@Model.Inventory.CustomString2Regex"
+                           title="@(string.IsNullOrEmpty(Model.Inventory.CustomString2Regex) ? "" : $"Must match the format: {Model.Inventory.CustomString2Regex}")" />
+                    <span asp-validation-for="Item.CustomString2Value" class="text-danger"></span>
                 </div>
             }
             @if (Model.Inventory?.CustomString3State == true)
             {
                 <div class="mb-3">
                     <label class="form-label">@Model.Inventory.CustomString3Name</label>
-                    <input name="Item.CustomString3Value" type="text" class="form-control" />
+                    <input name="Item.CustomString3Value" type="text" class="form-control"
+                           maxlength="@Model.Inventory.CustomString3MaxLength"
+                           pattern="@Model.Inventory.CustomString3Regex"
+                           title="@(string.IsNullOrEmpty(Model.Inventory.CustomString3Regex) ? "" : $"Must match the format: {Model.Inventory.CustomString3Regex}")" />
+                    <span asp-validation-for="Item.CustomString3Value" class="text-danger"></span>
                 </div>
             }
 
@@ -60,26 +72,38 @@
                 </div>
             }
 
-            @* --- Numeric Fields --- *@
+            @* --- Numeric Fields with Validation --- *@
             @if (Model.Inventory?.CustomNumeric1State == true)
             {
                 <div class="mb-3">
                     <label class="form-label">@Model.Inventory.CustomNumeric1Name</label>
-                    <input name="Item.CustomNumeric1Value" type="number" class="form-control" />
+                    <input name="Item.CustomNumeric1Value" type="number" class="form-control"
+                           min="@Model.Inventory.CustomNumeric1MinValue"
+                           max="@Model.Inventory.CustomNumeric1MaxValue"
+                           step="any" />
+                    <span asp-validation-for="Item.CustomNumeric1Value" class="text-danger"></span>
                 </div>
             }
             @if (Model.Inventory?.CustomNumeric2State == true)
             {
                 <div class="mb-3">
                     <label class="form-label">@Model.Inventory.CustomNumeric2Name</label>
-                    <input name="Item.CustomNumeric2Value" type="number" class="form-control" />
+                    <input name="Item.CustomNumeric2Value" type="number" class="form-control"
+                           min="@Model.Inventory.CustomNumeric2MinValue"
+                           max="@Model.Inventory.CustomNumeric2MaxValue"
+                           step="any" />
+                    <span asp-validation-for="Item.CustomNumeric2Value" class="text-danger"></span>
                 </div>
             }
             @if (Model.Inventory?.CustomNumeric3State == true)
             {
                 <div class="mb-3">
                     <label class="form-label">@Model.Inventory.CustomNumeric3Name</label>
-                    <input name="Item.CustomNumeric3Value" type="number" class="form-control" />
+                    <input name="Item.CustomNumeric3Value" type="number" class="form-control"
+                           min="@Model.Inventory.CustomNumeric3MinValue"
+                           max="@Model.Inventory.CustomNumeric3MaxValue"
+                           step="any" />
+                    <span asp-validation-for="Item.CustomNumeric3Value" class="text-danger"></span>
                 </div>
             }
 
@@ -172,7 +196,6 @@
                     </select>
                 </div>
             }
-
         </div>
     </div>
 
@@ -181,3 +204,9 @@
         <a asp-controller="Inventories" asp-action="Details" asp-route-id="@Model.InventoryId" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

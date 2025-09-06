@@ -81,6 +81,22 @@ namespace InventoryManagement.Domain.Entities
         public string CustomSelect3Name { get; set; } = string.Empty;
         public string CustomSelect3Options { get; set; } = string.Empty;
 
+        // --- Validation Rules for String Fields ---
+        public int? CustomString1MaxLength { get; set; }
+        public string? CustomString1Regex { get; set; } // For regex pattern validation
+        public int? CustomString2MaxLength { get; set; }
+        public string? CustomString2Regex { get; set; }
+        public int? CustomString3MaxLength { get; set; }
+        public string? CustomString3Regex { get; set; }
+
+        // --- Validation Rules for Numeric Fields ---
+        public decimal? CustomNumeric1MinValue { get; set; }
+        public decimal? CustomNumeric1MaxValue { get; set; }
+        public decimal? CustomNumeric2MinValue { get; set; }
+        public decimal? CustomNumeric2MaxValue { get; set; }
+        public decimal? CustomNumeric3MinValue { get; set; }
+        public decimal? CustomNumeric3MaxValue { get; set; }
+
         public virtual ICollection<Tag> Tags { get; set; } = new List<Tag>();
         public virtual ICollection<Comment> Comments { get; set; } = new List<Comment>();
 

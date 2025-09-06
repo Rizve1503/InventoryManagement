@@ -16,6 +16,12 @@ namespace InventoryManagement.WebApp.ViewModels
         [StringLength(100)] public string? CustomString2Name { get; set; }
         public bool CustomString3State { get; set; }
         [StringLength(100)] public string? CustomString3Name { get; set; }
+        [Range(1, 4000)] public int? CustomString1MaxLength { get; set; }
+        [StringLength(200)] public string? CustomString1Regex { get; set; }
+        [Range(1, 4000)] public int? CustomString2MaxLength { get; set; }
+        [StringLength(200)] public string? CustomString2Regex { get; set; }
+        [Range(1, 4000)] public int? CustomString3MaxLength { get; set; }
+        [StringLength(200)] public string? CustomString3Regex { get; set; }
 
         // Multi-line text fields
         public bool CustomText1State { get; set; }
@@ -32,6 +38,12 @@ namespace InventoryManagement.WebApp.ViewModels
         [StringLength(100)] public string? CustomNumeric2Name { get; set; }
         public bool CustomNumeric3State { get; set; }
         [StringLength(100)] public string? CustomNumeric3Name { get; set; }
+        public decimal? CustomNumeric1MinValue { get; set; }
+        public decimal? CustomNumeric1MaxValue { get; set; }
+        public decimal? CustomNumeric2MinValue { get; set; }
+        public decimal? CustomNumeric2MaxValue { get; set; }
+        public decimal? CustomNumeric3MinValue { get; set; }
+        public decimal? CustomNumeric3MaxValue { get; set; }
 
         // Boolean (checkbox) fields
         public bool CustomBool1State { get; set; }

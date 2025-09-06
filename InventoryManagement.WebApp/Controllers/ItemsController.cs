@@ -70,7 +70,6 @@ namespace InventoryManagement.WebApp.Controllers
             return View(model);
         }
 
-        // POST: /Items/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ItemViewModel model)
@@ -81,28 +80,36 @@ namespace InventoryManagement.WebApp.Controllers
                 ModelState.AddModelError("", "Invalid Inventory.");
                 return View(model);
             }
+            model.Inventory = inventory; // Re-assign for the view in case of error
 
-            // Re-assign for the view in case of error
-            model.Inventory = inventory;
-
-            // --- Authorization Check ---
-            var isCreator = inventory.CreatorId == GetCurrentUserId();
+            // Authorization Check
+            var currentUserId = GetCurrentUserId();
+            var isCreator = inventory.CreatorId == currentUserId;
             if (!isCreator && !inventory.IsPublic)
             {
                 return Forbid();
             }
 
+            // --- Start: Advanced Validation Logic ---
             if (ModelState.IsValid)
             {
-                // We bind the Item property from the ViewModel
-                var itemToCreate = model.Item;
-                if (itemToCreate == null)
-                {
-                    // This is an unexpected error
-                    return BadRequest("Item data is missing.");
-                }
+                // String Field Validation
+                if (inventory.CustomString1State) ValidateStringField(model.Item.CustomString1Value, inventory.CustomString1Name, inventory.CustomString1MaxLength, inventory.CustomString1Regex, "Item.CustomString1Value");
+                if (inventory.CustomString2State) ValidateStringField(model.Item.CustomString2Value, inventory.CustomString2Name, inventory.CustomString2MaxLength, inventory.CustomString2Regex, "Item.CustomString2Value");
+                if (inventory.CustomString3State) ValidateStringField(model.Item.CustomString3Value, inventory.CustomString3Name, inventory.CustomString3MaxLength, inventory.CustomString3Regex, "Item.CustomString3Value");
 
-                // Only generate a Custom ID if the inventory has a format defined.
+                // Numeric Field Validation
+                if (inventory.CustomNumeric1State) ValidateNumericField(model.Item.CustomNumeric1Value, inventory.CustomNumeric1Name, inventory.CustomNumeric1MinValue, inventory.CustomNumeric1MaxValue, "Item.CustomNumeric1Value");
+                if (inventory.CustomNumeric2State) ValidateNumericField(model.Item.CustomNumeric2Value, inventory.CustomNumeric2Name, inventory.CustomNumeric2MinValue, inventory.CustomNumeric2MaxValue, "Item.CustomNumeric2Value");
+                if (inventory.CustomNumeric3State) ValidateNumericField(model.Item.CustomNumeric3Value, inventory.CustomNumeric3Name, inventory.CustomNumeric3MinValue, inventory.CustomNumeric3MaxValue, "Item.CustomNumeric3Value");
+            }
+            // --- End: Advanced Validation Logic ---
+
+            if (ModelState.IsValid)
+            {
+                var itemToCreate = model.Item;
+
+                // Generate Custom ID if format is defined
                 if (!string.IsNullOrEmpty(inventory.CustomIdFormatJson))
                 {
                     itemToCreate.CustomId = await _customIdService.GenerateIdAsync(inventory);
@@ -113,9 +120,12 @@ namespace InventoryManagement.WebApp.Controllers
 
                 _context.Items.Add(itemToCreate);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index), new { inventoryId = model.InventoryId });
+
+                // Redirect to the Details page (tabbed view) after creation
+                return RedirectToAction("Details", "Inventories", new { id = model.InventoryId });
             }
 
+            // If we get here, something failed, redisplay form
             return View(model);
         }
 
@@ -127,6 +137,39 @@ namespace InventoryManagement.WebApp.Controllers
                 return userId;
             }
             throw new InvalidOperationException("User ID is not available in the claims.");
+        }
+
+        private void ValidateStringField(string? value, string fieldName, int? maxLength, string? regex, string propertyName)
+        {
+            if (!string.IsNullOrEmpty(value))
+            {
+                if (maxLength.HasValue && value.Length > maxLength.Value)
+                {
+                    ModelState.AddModelError(propertyName, $"{fieldName} cannot exceed {maxLength} characters.");
+                }
+                if (!string.IsNullOrEmpty(regex))
+                {
+                    if (!System.Text.RegularExpressions.Regex.IsMatch(value, regex))
+                    {
+                        ModelState.AddModelError(propertyName, $"{fieldName} does not match the required format.");
+                    }
+                }
+            }
+        }
+
+        private void ValidateNumericField(decimal? value, string fieldName, decimal? minValue, decimal? maxValue, string propertyName)
+        {
+            if (value.HasValue)
+            {
+                if (minValue.HasValue && value < minValue.Value)
+                {
+                    ModelState.AddModelError(propertyName, $"{fieldName} must be at least {minValue}.");
+                }
+                if (maxValue.HasValue && value > maxValue.Value)
+                {
+                    ModelState.AddModelError(propertyName, $"{fieldName} must not exceed {maxValue}.");
+                }
+            }
         }
     }
 }

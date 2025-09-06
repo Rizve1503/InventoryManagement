@@ -31,10 +31,21 @@ namespace InventoryManagement.Infrastructure.Data.Configurations
             // Configure RowVersion for optimistic concurrency
             builder.Property(i => i.RowVersion)
                 .IsRowVersion();
+
             // Configure the many-to-many relationship with Tag
             // EF Core will automatically create a join table called 'InventoryTag'
             builder.HasMany(i => i.Tags)
                 .WithMany(t => t.Inventories);
+
+            // We use a precision of 18 and a scale of 4. This is a good general-purpose choice,
+            // allowing for large numbers and up to four decimal places (e.g., 1234.5678).
+            builder.Property(i => i.CustomNumeric1MinValue).HasPrecision(18, 4);
+            builder.Property(i => i.CustomNumeric1MaxValue).HasPrecision(18, 4);
+            builder.Property(i => i.CustomNumeric2MinValue).HasPrecision(18, 4);
+            builder.Property(i => i.CustomNumeric2MaxValue).HasPrecision(18, 4);
+            builder.Property(i => i.CustomNumeric3MinValue).HasPrecision(18, 4);
+            builder.Property(i => i.CustomNumeric3MaxValue).HasPrecision(18, 4);
+
         }
     }
 }
