@@ -156,6 +156,9 @@
   <data name="Sign In" xml:space="preserve">
     <value>Iniciar Sesión</value>
   </data>
+  <data name="User Management" xml:space="preserve">
+    <value>Gestión de usuarios</value>
+  </data>
   <data name="You do not have permission to view this resource." xml:space="preserve">
     <value>No tienes permiso para ver este recurso.</value>
   </data>

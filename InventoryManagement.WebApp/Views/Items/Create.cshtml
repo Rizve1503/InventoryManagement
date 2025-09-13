@@ -3,7 +3,7 @@
 @inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @{
-    ViewData["Title"] = $"Add New Item to {Model.Inventory?.Title}";
+    // ViewData["Title"] = $"{InventoriesLocalizer["Add New Item to"]} {Model.Inventory?.Title}";
 }
 
 <h1>@ViewData["Title"]</h1>
@@ -16,193 +16,66 @@
     <div class="row">
         <div class="col-md-8">
 
-            @* --- Single-Line Text Fields with Validation --- *@
-            @if (Model.Inventory?.CustomString1State == true)
+            @foreach (var field in Model.OrderedFields)
             {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomString1Name</label>
-                    <input name="Item.CustomString1Value" type="text" class="form-control"
-                           maxlength="@Model.Inventory.CustomString1MaxLength"
-                           pattern="@Model.Inventory.CustomString1Regex"
-                           title="@(string.IsNullOrEmpty(Model.Inventory.CustomString1Regex) ? "" : $"Must match the format: {Model.Inventory.CustomString1Regex}")" />
-                    <span asp-validation-for="Item.CustomString1Value" class="text-danger"></span>
-                </div>
-            }
-            @if (Model.Inventory?.CustomString2State == true)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomString2Name</label>
-                    <input name="Item.CustomString2Value" type="text" class="form-control"
-                           maxlength="@Model.Inventory.CustomString2MaxLength"
-                           pattern="@Model.Inventory.CustomString2Regex"
-                           title="@(string.IsNullOrEmpty(Model.Inventory.CustomString2Regex) ? "" : $"Must match the format: {Model.Inventory.CustomString2Regex}")" />
-                    <span asp-validation-for="Item.CustomString2Value" class="text-danger"></span>
-                </div>
-            }
-            @if (Model.Inventory?.CustomString3State == true)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomString3Name</label>
-                    <input name="Item.CustomString3Value" type="text" class="form-control"
-                           maxlength="@Model.Inventory.CustomString3MaxLength"
-                           pattern="@Model.Inventory.CustomString3Regex"
-                           title="@(string.IsNullOrEmpty(Model.Inventory.CustomString3Regex) ? "" : $"Must match the format: {Model.Inventory.CustomString3Regex}")" />
-                    <span asp-validation-for="Item.CustomString3Value" class="text-danger"></span>
-                </div>
-            }
+                @if (field.State) // Only render the field if it's enabled
+                {
+                    var fieldName = field.Name ?? "";
+                    var fieldKey = field.FieldKey;
 
-            @* --- Multi-Line Text Fields --- *@
-            @if (Model.Inventory?.CustomText1State == true)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomText1Name</label>
-                    <textarea name="Item.CustomText1Value" class="form-control" rows="3"></textarea>
-                </div>
-            }
-            @if (Model.Inventory?.CustomText2State == true)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomText2Name</label>
-                    <textarea name="Item.CustomText2Value" class="form-control" rows="3"></textarea>
-                </div>
-            }
-            @if (Model.Inventory?.CustomText3State == true)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomText3Name</label>
-                    <textarea name="Item.CustomText3Value" class="form-control" rows="3"></textarea>
-                </div>
-            }
+                    @if (field.FieldType == "Select from List")
+                    {
+                        var options = (field.Options ?? "").Split(',', StringSplitOptions.RemoveEmptyEntries).Select(o => o.Trim());
+                        <div class="mb-3">
+                            <label class="form-label">@fieldName</label>
+                            <select name="Item.@(fieldKey.Replace("csel", "CustomSelect") + "Value")" class="form-select">
+                                <option value="">-- @InventoriesLocalizer["Select"] --</option>
+                                @foreach (var option in options)
+                                {
+                                    <option value="@option">@option</option>
+                                }
+                            </select>
+                        </div>
+                    }
+                    else if (field.FieldType == "Multi-Line Text")
+                    {
+                        <div class="mb-3">
+                            <label class="form-label">@fieldName</label>
+                            <textarea name="Item.@(fieldKey.Replace("ct", "CustomText") + "Value")" class="form-control" rows="3"></textarea>
+                        </div>
+                    }
+                    else if (field.FieldType == "Checkbox (Yes/No)")
+                    {
+                        <div class="mb-3 form-check">
+                            <input name="Item.@(fieldKey.Replace("cb", "CustomBool") + "Value")" type="checkbox" class="form-check-input" value="true" />
+                            <label class="form-check-label">@fieldName</label>
+                        </div>
+                    }
+                    else // Covers String, Numeric, and Link types
+                    {
+                        var inputType = field.FieldType == "Numeric" ? "number" : (field.FieldType.Contains("Link") ? "url" : "text");
+                        var valuePropName = "Item." + (fieldKey.Replace("cs", "CustomString").Replace("cn", "CustomNumeric").Replace("cl", "CustomLink") + "Value");
 
-            @* --- Numeric Fields with Validation --- *@
-            @if (Model.Inventory?.CustomNumeric1State == true)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomNumeric1Name</label>
-                    <input name="Item.CustomNumeric1Value" type="number" class="form-control"
-                           min="@Model.Inventory.CustomNumeric1MinValue"
-                           max="@Model.Inventory.CustomNumeric1MaxValue"
-                           step="any" />
-                    <span asp-validation-for="Item.CustomNumeric1Value" class="text-danger"></span>
-                </div>
-            }
-            @if (Model.Inventory?.CustomNumeric2State == true)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomNumeric2Name</label>
-                    <input name="Item.CustomNumeric2Value" type="number" class="form-control"
-                           min="@Model.Inventory.CustomNumeric2MinValue"
-                           max="@Model.Inventory.CustomNumeric2MaxValue"
-                           step="any" />
-                    <span asp-validation-for="Item.CustomNumeric2Value" class="text-danger"></span>
-                </div>
-            }
-            @if (Model.Inventory?.CustomNumeric3State == true)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomNumeric3Name</label>
-                    <input name="Item.CustomNumeric3Value" type="number" class="form-control"
-                           min="@Model.Inventory.CustomNumeric3MinValue"
-                           max="@Model.Inventory.CustomNumeric3MaxValue"
-                           step="any" />
-                    <span asp-validation-for="Item.CustomNumeric3Value" class="text-danger"></span>
-                </div>
-            }
+                        <div class="mb-3">
+                            <label class="form-label">@fieldName</label>
 
-            @* --- Checkbox (Boolean) Fields --- *@
-            @if (Model.Inventory?.CustomBool1State == true)
-            {
-                <div class="mb-3 form-check">
-                    <input name="Item.CustomBool1Value" type="checkbox" class="form-check-input" value="true" />
-                    <label class="form-check-label">@Model.Inventory.CustomBool1Name</label>
-                </div>
-            }
-            @if (Model.Inventory?.CustomBool2State == true)
-            {
-                <div class="mb-3 form-check">
-                    <input name="Item.CustomBool2Value" type="checkbox" class="form-check-input" value="true" />
-                    <label class="form-check-label">@Model.Inventory.CustomBool2Name</label>
-                </div>
-            }
-            @if (Model.Inventory?.CustomBool3State == true)
-            {
-                <div class="mb-3 form-check">
-                    <input name="Item.CustomBool3Value" type="checkbox" class="form-check-input" value="true" />
-                    <label class="form-check-label">@Model.Inventory.CustomBool3Name</label>
-                </div>
-            }
-
-            @* --- Document/Image Link Fields --- *@
-            @if (Model.Inventory?.CustomLink1State == true)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomLink1Name</label>
-                    <input name="Item.CustomLink1Value" type="url" class="form-control" />
-                </div>
-            }
-            @if (Model.Inventory?.CustomLink2State == true)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomLink2Name</label>
-                    <input name="Item.CustomLink2Value" type="url" class="form-control" />
-                </div>
-            }
-            @if (Model.Inventory?.CustomLink3State == true)
-            {
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomLink3Name</label>
-                    <input name="Item.CustomLink3Value" type="url" class="form-control" />
-                </div>
-            }
-
-            @* --- Select from List Fields --- *@
-            @if (Model.Inventory?.CustomSelect1State == true)
-            {
-                var options = Model.Inventory.CustomSelect1Options.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(o => o.Trim());
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomSelect1Name</label>
-                    <select name="Item.CustomSelect1Value" class="form-select">
-                        <option value="">-- @InventoriesLocalizer["Select"] --</option>
-                        @foreach (var option in options)
-                        {
-                            <option value="@option">@option</option>
-                        }
-                    </select>
-                </div>
-            }
-            @if (Model.Inventory?.CustomSelect2State == true)
-            {
-                var options = Model.Inventory.CustomSelect2Options.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(o => o.Trim());
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomSelect2Name</label>
-                    <select name="Item.CustomSelect2Value" class="form-select">
-                        <option value="">-- @InventoriesLocalizer["Select"] --</option>
-                        @foreach (var option in options)
-                        {
-                            <option value="@option">@option</option>
-                        }
-                    </select>
-                </div>
-            }
-            @if (Model.Inventory?.CustomSelect3State == true)
-            {
-                var options = Model.Inventory.CustomSelect3Options.Split(',', StringSplitOptions.RemoveEmptyEntries).Select(o => o.Trim());
-                <div class="mb-3">
-                    <label class="form-label">@Model.Inventory.CustomSelect3Name</label>
-                    <select name="Item.CustomSelect3Value" class="form-select">
-                        <option value="">-- @InventoriesLocalizer["Select"] --</option>
-                        @foreach (var option in options)
-                        {
-                            <option value="@option">@option</option>
-                        }
-                    </select>
-                </div>
+                            <input name="@valuePropName" type="@inputType" class="form-control"
+                                   maxlength="@field.MaxLength"
+                                   pattern="@field.Regex"
+                                   min="@(field.MinValue.HasValue? field.MinValue.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : null)"
+                                   max="@(field.MaxValue.HasValue? field.MaxValue.Value.ToString(System.Globalization.CultureInfo.InvariantCulture) : null)"
+                                   step="@(inputType == "number" ? "any" : null)"
+                                   title="@(string.IsNullOrEmpty(field.Regex) ? "" : $"Must match the format: {field.Regex}")" />
+                            <span asp-validation-for="@valuePropName" class="text-danger"></span>
+                        </div>
+                    }
+                }
             }
         </div>
     </div>
 
     <div class="form-group mt-3">
-        <input type="submit" value="Create Item" class="btn btn-primary" />
+        <input type="submit" value="@InventoriesLocalizer["Create Item"]" class="btn btn-primary" />
         <a asp-controller="Inventories" asp-action="Details" asp-route-id="@Model.InventoryId" class="btn btn-secondary">@InventoriesLocalizer["Cancel"]</a>
     </div>
 </form>

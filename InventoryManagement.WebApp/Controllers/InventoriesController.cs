@@ -212,70 +212,120 @@ namespace InventoryManagement.WebApp.Controllers
             // throw new InvalidOperationException("User ID is not available in the claims.");
             return 0; // Return a default value (e.g., 0) instead of null for non-nullable int
         }
+
+
         // GET: /Inventories/Fields/5
         [HttpGet]
         public async Task<IActionResult> Fields(int? id)
         {
             if (id == null) return NotFound();
-            var inventory = await _context.Inventories
-            .AsNoTracking()
-            .FirstOrDefaultAsync(i => i.Id == id);
+            var inventory = await _context.Inventories.AsNoTracking().FirstOrDefaultAsync(i => i.Id == id);
             if (inventory == null) return NotFound();
-            // Authorization Check
             if (inventory.CreatorId != GetCurrentUserId()) return Forbid();
-            var model = new CustomFieldsViewModel
+
+            var model = new CustomFieldsPageViewModel
             {
                 InventoryId = inventory.Id,
                 InventoryTitle = inventory.Title,
-                RowVersion = inventory.RowVersion,
-                // Single-line text fields
-                CustomString1State = inventory.CustomString1State,
-                CustomString1Name = inventory.CustomString1Name,
-                CustomString2State = inventory.CustomString2State,
-                CustomString2Name = inventory.CustomString2Name,
-                CustomString3State = inventory.CustomString3State,
-                CustomString3Name = inventory.CustomString3Name,
-                // Multi-line text fields
-                CustomText1State = inventory.CustomText1State,
-                CustomText1Name = inventory.CustomText1Name,
-                CustomText2State = inventory.CustomText2State,
-                CustomText2Name = inventory.CustomText2Name,
-                CustomText3State = inventory.CustomText3State,
-                CustomText3Name = inventory.CustomText3Name,
-                // Numeric fields
-                CustomNumeric1State = inventory.CustomNumeric1State,
-                CustomNumeric1Name = inventory.CustomNumeric1Name,
-                CustomNumeric2State = inventory.CustomNumeric2State,
-                CustomNumeric2Name = inventory.CustomNumeric2Name,
-                CustomNumeric3State = inventory.CustomNumeric3State,
-                CustomNumeric3Name = inventory.CustomNumeric3Name,
-                // Boolean (checkbox) fields
-                CustomBool1State = inventory.CustomBool1State,
-                CustomBool1Name = inventory.CustomBool1Name,
-                CustomBool2State = inventory.CustomBool2State,
-                CustomBool2Name = inventory.CustomBool2Name,
-                CustomBool3State = inventory.CustomBool3State,
-                CustomBool3Name = inventory.CustomBool3Name,
-                // Document/Image Link fields
-                CustomLink1State = inventory.CustomLink1State,
-                CustomLink1Name = inventory.CustomLink1Name,
-                CustomLink2State = inventory.CustomLink2State,
-                CustomLink2Name = inventory.CustomLink2Name,
-                CustomLink3State = inventory.CustomLink3State,
-                CustomLink3Name = inventory.CustomLink3Name,
-                // Select from List fields
-                CustomSelect1State = inventory.CustomSelect1State,
-                CustomSelect1Name = inventory.CustomSelect1Name,
-                CustomSelect1Options = inventory.CustomSelect1Options,
-                CustomSelect2State = inventory.CustomSelect2State,
-                CustomSelect2Name = inventory.CustomSelect2Name,
-                CustomSelect2Options = inventory.CustomSelect2Options,
-                CustomSelect3State = inventory.CustomSelect3State,
-                CustomSelect3Name = inventory.CustomSelect3Name,
-                CustomSelect3Options = inventory.CustomSelect3Options
+                RowVersion = inventory.RowVersion
             };
+
+            // Create a dictionary of all possible fields for easy lookup
+            var allFields = new Dictionary<string, CustomFieldViewModel>
+    {
+        {"cs1", new CustomFieldViewModel { FieldKey = "cs1", FieldType = "Single-Line Text", State = inventory.CustomString1State, Name = inventory.CustomString1Name, MaxLength = inventory.CustomString1MaxLength, Regex = inventory.CustomString1Regex }},
+        {"cs2", new CustomFieldViewModel { FieldKey = "cs2", FieldType = "Single-Line Text", State = inventory.CustomString2State, Name = inventory.CustomString2Name, MaxLength = inventory.CustomString2MaxLength, Regex = inventory.CustomString2Regex }},
+        {"cs3", new CustomFieldViewModel { FieldKey = "cs3", FieldType = "Single-Line Text", State = inventory.CustomString3State, Name = inventory.CustomString3Name, MaxLength = inventory.CustomString3MaxLength, Regex = inventory.CustomString3Regex }},
+        {"ct1", new CustomFieldViewModel { FieldKey = "ct1", FieldType = "Multi-Line Text", State = inventory.CustomText1State, Name = inventory.CustomText1Name }},
+        {"ct2", new CustomFieldViewModel { FieldKey = "ct2", FieldType = "Multi-Line Text", State = inventory.CustomText2State, Name = inventory.CustomText2Name }},
+        {"ct3", new CustomFieldViewModel { FieldKey = "ct3", FieldType = "Multi-Line Text", State = inventory.CustomText3State, Name = inventory.CustomText3Name }},
+        {"cn1", new CustomFieldViewModel { FieldKey = "cn1", FieldType = "Numeric", State = inventory.CustomNumeric1State, Name = inventory.CustomNumeric1Name, MinValue = inventory.CustomNumeric1MinValue, MaxValue = inventory.CustomNumeric1MaxValue }},
+        {"cn2", new CustomFieldViewModel { FieldKey = "cn2", FieldType = "Numeric", State = inventory.CustomNumeric2State, Name = inventory.CustomNumeric2Name, MinValue = inventory.CustomNumeric2MinValue, MaxValue = inventory.CustomNumeric2MaxValue }},
+        {"cn3", new CustomFieldViewModel { FieldKey = "cn3", FieldType = "Numeric", State = inventory.CustomNumeric3State, Name = inventory.CustomNumeric3Name, MinValue = inventory.CustomNumeric3MinValue, MaxValue = inventory.CustomNumeric3MaxValue }},
+        {"cb1", new CustomFieldViewModel { FieldKey = "cb1", FieldType = "Checkbox (Yes/No)", State = inventory.CustomBool1State, Name = inventory.CustomBool1Name }},
+        {"cb2", new CustomFieldViewModel { FieldKey = "cb2", FieldType = "Checkbox (Yes/No)", State = inventory.CustomBool2State, Name = inventory.CustomBool2Name }},
+        {"cb3", new CustomFieldViewModel { FieldKey = "cb3", FieldType = "Checkbox (Yes/No)", State = inventory.CustomBool3State, Name = inventory.CustomBool3Name }},
+        {"cl1", new CustomFieldViewModel { FieldKey = "cl1", FieldType = "Document/Image Link", State = inventory.CustomLink1State, Name = inventory.CustomLink1Name }},
+        {"cl2", new CustomFieldViewModel { FieldKey = "cl2", FieldType = "Document/Image Link", State = inventory.CustomLink2State, Name = inventory.CustomLink2Name }},
+        {"cl3", new CustomFieldViewModel { FieldKey = "cl3", FieldType = "Document/Image Link", State = inventory.CustomLink3State, Name = inventory.CustomLink3Name }},
+        {"csel1", new CustomFieldViewModel { FieldKey = "csel1", FieldType = "Select from List", State = inventory.CustomSelect1State, Name = inventory.CustomSelect1Name, Options = inventory.CustomSelect1Options }},
+        {"csel2", new CustomFieldViewModel { FieldKey = "csel2", FieldType = "Select from List", State = inventory.CustomSelect2State, Name = inventory.CustomSelect2Name, Options = inventory.CustomSelect2Options }},
+        {"csel3", new CustomFieldViewModel { FieldKey = "csel3", FieldType = "Select from List", State = inventory.CustomSelect3State, Name = inventory.CustomSelect3Name, Options = inventory.CustomSelect3Options }},
+    };
+
+            // Determine the order
+            if (!string.IsNullOrEmpty(inventory.CustomFieldOrderJson))
+            {
+                var orderedKeys = JsonSerializer.Deserialize<List<string>>(inventory.CustomFieldOrderJson);
+                foreach (var key in orderedKeys)
+                {
+                    if (allFields.ContainsKey(key))
+                    {
+                        model.Fields.Add(allFields[key]);
+                        allFields.Remove(key); // Remove to avoid duplication
+                    }
+                }
+            }
+
+            // Add any remaining fields that weren't in the saved order (e.g., new fields added in an update)
+            model.Fields.AddRange(allFields.Values);
+
             return View(model);
         }
+
+        // POST: /Inventories/Fields/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Fields(int id, CustomFieldsPageViewModel model)
+        {
+            if (id != model.InventoryId) return NotFound();
+
+            var inventoryToUpdate = await _context.Inventories.FirstOrDefaultAsync(i => i.Id == id);
+            if (inventoryToUpdate == null) return NotFound();
+            if (inventoryToUpdate.CreatorId != GetCurrentUserId()) return Forbid();
+
+            if (!ModelState.IsValid)
+            {
+                model.InventoryTitle = inventoryToUpdate.Title;
+                return View(model);
+            }
+
+            // Save the new display order
+            inventoryToUpdate.CustomFieldOrderJson = model.FieldOrderJson;
+
+            // Update all field properties based on the submitted list
+            foreach (var field in model.Fields)
+            {
+                switch (field.FieldKey)
+                {
+                    case "cs1": inventoryToUpdate.CustomString1State = field.State; inventoryToUpdate.CustomString1Name = field.State ? field.Name ?? "" : ""; inventoryToUpdate.CustomString1MaxLength = field.MaxLength; inventoryToUpdate.CustomString1Regex = field.Regex; break;
+                    case "cs2": inventoryToUpdate.CustomString2State = field.State; inventoryToUpdate.CustomString2Name = field.State ? field.Name ?? "" : ""; inventoryToUpdate.CustomString2MaxLength = field.MaxLength; inventoryToUpdate.CustomString2Regex = field.Regex; break;
+                    case "cs3": inventoryToUpdate.CustomString3State = field.State; inventoryToUpdate.CustomString3Name = field.State ? field.Name ?? "" : ""; inventoryToUpdate.CustomString3MaxLength = field.MaxLength; inventoryToUpdate.CustomString3Regex = field.Regex; break;
+                    case "ct1": inventoryToUpdate.CustomText1State = field.State; inventoryToUpdate.CustomText1Name = field.State ? field.Name ?? "" : ""; break;
+                    case "ct2": inventoryToUpdate.CustomText2State = field.State; inventoryToUpdate.CustomText2Name = field.State ? field.Name ?? "" : ""; break;
+                    case "ct3": inventoryToUpdate.CustomText3State = field.State; inventoryToUpdate.CustomText3Name = field.State ? field.Name ?? "" : ""; break;
+                    case "cn1": inventoryToUpdate.CustomNumeric1State = field.State; inventoryToUpdate.CustomNumeric1Name = field.State ? field.Name ?? "" : ""; inventoryToUpdate.CustomNumeric1MinValue = field.MinValue; inventoryToUpdate.CustomNumeric1MaxValue = field.MaxValue; break;
+                    case "cn2": inventoryToUpdate.CustomNumeric2State = field.State; inventoryToUpdate.CustomNumeric2Name = field.State ? field.Name ?? "" : ""; inventoryToUpdate.CustomNumeric2MinValue = field.MinValue; inventoryToUpdate.CustomNumeric2MaxValue = field.MaxValue; break;
+                    case "cn3": inventoryToUpdate.CustomNumeric3State = field.State; inventoryToUpdate.CustomNumeric3Name = field.State ? field.Name ?? "" : ""; inventoryToUpdate.CustomNumeric3MinValue = field.MinValue; inventoryToUpdate.CustomNumeric3MaxValue = field.MaxValue; break;
+                    case "cb1": inventoryToUpdate.CustomBool1State = field.State; inventoryToUpdate.CustomBool1Name = field.State ? field.Name ?? "" : ""; break;
+                    case "cb2": inventoryToUpdate.CustomBool2State = field.State; inventoryToUpdate.CustomBool2Name = field.State ? field.Name ?? "" : ""; break;
+                    case "cb3": inventoryToUpdate.CustomBool3State = field.State; inventoryToUpdate.CustomBool3Name = field.State ? field.Name ?? "" : ""; break;
+                    case "cl1": inventoryToUpdate.CustomLink1State = field.State; inventoryToUpdate.CustomLink1Name = field.State ? field.Name ?? "" : ""; break;
+                    case "cl2": inventoryToUpdate.CustomLink2State = field.State; inventoryToUpdate.CustomLink2Name = field.State ? field.Name ?? "" : ""; break;
+                    case "cl3": inventoryToUpdate.CustomLink3State = field.State; inventoryToUpdate.CustomLink3Name = field.State ? field.Name ?? "" : ""; break;
+                    case "csel1": inventoryToUpdate.CustomSelect1State = field.State; inventoryToUpdate.CustomSelect1Name = field.State ? field.Name ?? "" : ""; inventoryToUpdate.CustomSelect1Options = field.State ? field.Options ?? "" : ""; break;
+                    case "csel2": inventoryToUpdate.CustomSelect2State = field.State; inventoryToUpdate.CustomSelect2Name = field.State ? field.Name ?? "" : ""; inventoryToUpdate.CustomSelect2Options = field.State ? field.Options ?? "" : ""; break;
+                    case "csel3": inventoryToUpdate.CustomSelect3State = field.State; inventoryToUpdate.CustomSelect3Name = field.State ? field.Name ?? "" : ""; inventoryToUpdate.CustomSelect3Options = field.State ? field.Options ?? "" : ""; break;
+                }
+            }
+
+            _context.Inventories.Update(inventoryToUpdate);
+            await _context.SaveChangesAsync();
+
+            TempData["SuccessMessage"] = "Custom fields saved successfully!";
+            return RedirectToAction(nameof(Fields), new { id = model.InventoryId });
+        }
+
         [AllowAnonymous]
         [HttpGet]
         public async Task<IActionResult> GetStatsForInventory(int inventoryId)
@@ -353,97 +403,7 @@ namespace InventoryManagement.WebApp.Controllers
             }
             return new JsonResult(model);
         }
-        // POST: /Inventories/Fields/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Fields(int id, CustomFieldsViewModel model)
-        {
-            if (id != model.InventoryId)
-            {
-                return NotFound();
-            }
-            // We must load the entity fresh from the database to ensure we have the latest version to update.
-            var inventoryToUpdate = await _context.Inventories.FirstOrDefaultAsync(i => i.Id == id);
-            if (inventoryToUpdate == null)
-            {
-                // This can happen if another user deleted the inventory.
-                TempData["ErrorMessage"] = "The inventory you tried to edit was deleted.";
-                return RedirectToAction(nameof(Index));
-            }
-            // Authorization Check
-            if (inventoryToUpdate.CreatorId != GetCurrentUserId())
-            {
-                return Forbid();
-            }
-            if (!ModelState.IsValid)
-            {
-                model.InventoryTitle = inventoryToUpdate.Title; // Repopulate title on error
-                return View(model);
-            }
-            // --- Start of Complete and Correct Property Mapping ---
-            // Single-line text fields
-            inventoryToUpdate.CustomString1State = model.CustomString1State;
-            inventoryToUpdate.CustomString1Name = model.CustomString1State ? (model.CustomString1Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomString2State = model.CustomString2State;
-            inventoryToUpdate.CustomString2Name = model.CustomString2State ? (model.CustomString2Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomString3State = model.CustomString3State;
-            inventoryToUpdate.CustomString3Name = model.CustomString3State ? (model.CustomString3Name ?? string.Empty) : string.Empty;
-            // Multi-line text fields
-            inventoryToUpdate.CustomText1State = model.CustomText1State;
-            inventoryToUpdate.CustomText1Name = model.CustomText1State ? (model.CustomText1Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomText2State = model.CustomText2State;
-            inventoryToUpdate.CustomText2Name = model.CustomText2State ? (model.CustomText2Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomText3State = model.CustomText3State;
-            inventoryToUpdate.CustomText3Name = model.CustomText3State ? (model.CustomText3Name ?? string.Empty) : string.Empty;
-            // Numeric fields
-            inventoryToUpdate.CustomNumeric1State = model.CustomNumeric1State;
-            inventoryToUpdate.CustomNumeric1Name = model.CustomNumeric1State ? (model.CustomNumeric1Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomNumeric2State = model.CustomNumeric2State;
-            inventoryToUpdate.CustomNumeric2Name = model.CustomNumeric2State ? (model.CustomNumeric2Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomNumeric3State = model.CustomNumeric3State;
-            inventoryToUpdate.CustomNumeric3Name = model.CustomNumeric3State ? (model.CustomNumeric3Name ?? string.Empty) : string.Empty;
-            // Boolean (checkbox) fields
-            inventoryToUpdate.CustomBool1State = model.CustomBool1State;
-            inventoryToUpdate.CustomBool1Name = model.CustomBool1State ? (model.CustomBool1Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomBool2State = model.CustomBool2State;
-            inventoryToUpdate.CustomBool2Name = model.CustomBool2State ? (model.CustomBool2Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomBool3State = model.CustomBool3State;
-            inventoryToUpdate.CustomBool3Name = model.CustomBool3State ? (model.CustomBool3Name ?? string.Empty) : string.Empty;
-            // Document/Image Link fields
-            inventoryToUpdate.CustomLink1State = model.CustomLink1State;
-            inventoryToUpdate.CustomLink1Name = model.CustomLink1State ? (model.CustomLink1Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomLink2State = model.CustomLink2State;
-            inventoryToUpdate.CustomLink2Name = model.CustomLink2State ? (model.CustomLink2Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomLink3State = model.CustomLink3State;
-            inventoryToUpdate.CustomLink3Name = model.CustomLink3State ? (model.CustomLink3Name ?? string.Empty) : string.Empty;
-            // Select from List fields
-            inventoryToUpdate.CustomSelect1State = model.CustomSelect1State;
-            inventoryToUpdate.CustomSelect1Name = model.CustomSelect1State ? (model.CustomSelect1Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomSelect1Options = model.CustomSelect1State ? (model.CustomSelect1Options ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomSelect2State = model.CustomSelect2State;
-            inventoryToUpdate.CustomSelect2Name = model.CustomSelect2State ? (model.CustomSelect2Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomSelect2Options = model.CustomSelect2State ? (model.CustomSelect2Options ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomSelect3State = model.CustomSelect3State;
-            inventoryToUpdate.CustomSelect3Name = model.CustomSelect3State ? (model.CustomSelect3Name ?? string.Empty) : string.Empty;
-            inventoryToUpdate.CustomSelect3Options = model.CustomSelect3State ? (model.CustomSelect3Options ?? string.Empty) : string.Empty;
-            // --- End of Complete Property Mapping ---
-            inventoryToUpdate.UpdatedAt = DateTime.UtcNow;
-            try
-            {
-                // Tell EF that the entity has been modified.
-                _context.Inventories.Update(inventoryToUpdate);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Custom fields saved successfully!";
-                return RedirectToAction(nameof(Fields), new { id = model.InventoryId });
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                // This error is now less likely but is good practice to keep.
-                ModelState.AddModelError(string.Empty, "These settings were modified by another user. Please reload and try again.");
-                model.InventoryTitle = inventoryToUpdate.Title;
-                return View(model);
-            }
-        }
+        
         // GET: /Inventories/CustomId/5
         public async Task<IActionResult> CustomId(int id)
         {
@@ -560,18 +520,63 @@ namespace InventoryManagement.WebApp.Controllers
         [HttpGet]
         public async Task<IActionResult> GetItemsForInventory(int inventoryId)
         {
-            var inventory = await _context.Inventories.FindAsync(inventoryId);
+            var inventory = await _context.Inventories.AsNoTracking().FirstOrDefaultAsync(i => i.Id == inventoryId);
             if (inventory == null) return NotFound();
+
             var items = await _context.Items
-            .Include(i => i.Likes) // Eager load the likes
-            .Where(i => i.InventoryId == inventoryId)
-            .OrderByDescending(i => i.CreatedAt)
-            .ToListAsync();
-            // Pass the current user ID to the view to determine if they've liked each item
+                .Include(i => i.Likes)
+                .Where(i => i.InventoryId == inventoryId)
+                .OrderByDescending(i => i.CreatedAt)
+                .ToListAsync();
+
+            // We must build the ordered field list and pass it to the view.
+            var allFields = new Dictionary<string, CustomFieldViewModel>
+            {
+                {"cs1", new CustomFieldViewModel { FieldKey = "cs1", FieldType = "Single-Line Text", State = inventory.CustomString1State, Name = inventory.CustomString1Name, MaxLength = inventory.CustomString1MaxLength, Regex = inventory.CustomString1Regex }},
+                {"cs2", new CustomFieldViewModel { FieldKey = "cs2", FieldType = "Single-Line Text", State = inventory.CustomString2State, Name = inventory.CustomString2Name, MaxLength = inventory.CustomString2MaxLength, Regex = inventory.CustomString2Regex }},
+                {"cs3", new CustomFieldViewModel { FieldKey = "cs3", FieldType = "Single-Line Text", State = inventory.CustomString3State, Name = inventory.CustomString3Name, MaxLength = inventory.CustomString3MaxLength, Regex = inventory.CustomString3Regex }},
+                {"ct1", new CustomFieldViewModel { FieldKey = "ct1", FieldType = "Multi-Line Text", State = inventory.CustomText1State, Name = inventory.CustomText1Name }},
+                {"ct2", new CustomFieldViewModel { FieldKey = "ct2", FieldType = "Multi-Line Text", State = inventory.CustomText2State, Name = inventory.CustomText2Name }},
+                {"ct3", new CustomFieldViewModel { FieldKey = "ct3", FieldType = "Multi-Line Text", State = inventory.CustomText3State, Name = inventory.CustomText3Name }},
+                {"cn1", new CustomFieldViewModel { FieldKey = "cn1", FieldType = "Numeric", State = inventory.CustomNumeric1State, Name = inventory.CustomNumeric1Name, MinValue = inventory.CustomNumeric1MinValue, MaxValue = inventory.CustomNumeric1MaxValue }},
+                {"cn2", new CustomFieldViewModel { FieldKey = "cn2", FieldType = "Numeric", State = inventory.CustomNumeric2State, Name = inventory.CustomNumeric2Name, MinValue = inventory.CustomNumeric2MinValue, MaxValue = inventory.CustomNumeric2MaxValue }},
+                {"cn3", new CustomFieldViewModel { FieldKey = "cn3", FieldType = "Numeric", State = inventory.CustomNumeric3State, Name = inventory.CustomNumeric3Name, MinValue = inventory.CustomNumeric3MinValue, MaxValue = inventory.CustomNumeric3MaxValue }},
+                {"cb1", new CustomFieldViewModel { FieldKey = "cb1", FieldType = "Checkbox (Yes/No)", State = inventory.CustomBool1State, Name = inventory.CustomBool1Name }},
+                {"cb2", new CustomFieldViewModel { FieldKey = "cb2", FieldType = "Checkbox (Yes/No)", State = inventory.CustomBool2State, Name = inventory.CustomBool2Name }},
+                {"cb3", new CustomFieldViewModel { FieldKey = "cb3", FieldType = "Checkbox (Yes/No)", State = inventory.CustomBool3State, Name = inventory.CustomBool3Name }},
+                {"cl1", new CustomFieldViewModel { FieldKey = "cl1", FieldType = "Document/Image Link", State = inventory.CustomLink1State, Name = inventory.CustomLink1Name }},
+                {"cl2", new CustomFieldViewModel { FieldKey = "cl2", FieldType = "Document/Image Link", State = inventory.CustomLink2State, Name = inventory.CustomLink2Name }},
+                {"cl3", new CustomFieldViewModel { FieldKey = "cl3", FieldType = "Document/Image Link", State = inventory.CustomLink3State, Name = inventory.CustomLink3Name }},
+                {"csel1", new CustomFieldViewModel { FieldKey = "csel1", FieldType = "Select from List", State = inventory.CustomSelect1State, Name = inventory.CustomSelect1Name, Options = inventory.CustomSelect1Options }},
+                {"csel2", new CustomFieldViewModel { FieldKey = "csel2", FieldType = "Select from List", State = inventory.CustomSelect2State, Name = inventory.CustomSelect2Name, Options = inventory.CustomSelect2Options }},
+                {"csel3", new CustomFieldViewModel { FieldKey = "csel3", FieldType = "Select from List", State = inventory.CustomSelect3State, Name = inventory.CustomSelect3Name, Options = inventory.CustomSelect3Options }},
+            };
+            var orderedFields = new List<CustomFieldViewModel>();
+            if (!string.IsNullOrEmpty(inventory.CustomFieldOrderJson))
+            {
+                var orderedKeys = JsonSerializer.Deserialize<List<string>>(inventory.CustomFieldOrderJson);
+                if (orderedKeys != null)
+                {
+                    foreach (var key in orderedKeys)
+                    {
+                        if (allFields.ContainsKey(key))
+                        {
+                            orderedFields.Add(allFields[key]);
+                            allFields.Remove(key);
+                        }
+                    }
+                }
+            }
+            orderedFields.AddRange(allFields.Values);
+
+            ViewBag.OrderedFields = orderedFields;
+
             ViewBag.CurrentUserId = GetCurrentUserId();
             ViewBag.Inventory = inventory;
+
             return PartialView("_ItemListPartial", items);
         }
+
         // GET: Inventories/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {

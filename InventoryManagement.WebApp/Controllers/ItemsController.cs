@@ -5,7 +5,12 @@ using InventoryManagement.WebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic; 
+using System.Linq; 
 using System.Security.Claims;
+using System.Text.Json;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc.Localization;
 
 namespace InventoryManagement.WebApp.Controllers
 {
@@ -14,11 +19,13 @@ namespace InventoryManagement.WebApp.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ICustomIdService _customIdService;
+        private readonly IHtmlLocalizer<InventoriesController> _inventoriesLocalizer;
 
-        public ItemsController(ApplicationDbContext context, ICustomIdService customIdService)
+        public ItemsController(ApplicationDbContext context, ICustomIdService customIdService, IHtmlLocalizer<InventoriesController> inventoriesLocalizer)
         {
             _context = context;
             _customIdService = customIdService;
+            _inventoriesLocalizer = inventoriesLocalizer;
         }
 
         [AllowAnonymous]
@@ -44,6 +51,7 @@ namespace InventoryManagement.WebApp.Controllers
         }
 
         // GET: /Items/Create?inventoryId=5
+        [HttpGet]
         public async Task<IActionResult> Create(int inventoryId)
         {
             var inventory = await _context.Inventories.FindAsync(inventoryId);
@@ -52,20 +60,63 @@ namespace InventoryManagement.WebApp.Controllers
                 return NotFound();
             }
 
-            // --- Authorization Check ---
-            // A user can add items if they are the creator OR the inventory is public.
-            var isCreator = inventory.CreatorId == GetCurrentUserId();
-            if (!isCreator && !inventory.IsPublic)
+            var currentUserId = GetCurrentUserId();
+            if (!inventory.IsPublic && inventory.CreatorId != currentUserId)
             {
                 return Forbid();
             }
 
+            ViewData["Title"] = _inventoriesLocalizer["Add New Item to {0}", inventory.Title];
+
             var model = new ItemViewModel
             {
                 InventoryId = inventoryId,
-                Inventory = inventory,
-                Item = new Item() // Initialize a new item for the form
+                Inventory = inventory, // This still provides the full inventory context
+                Item = new Item()
             };
+
+            // Create a dictionary of all possible fields for easy lookup
+            var allFields = new Dictionary<string, CustomFieldViewModel>
+            {
+                {"cs1", new CustomFieldViewModel { FieldKey = "cs1", FieldType = "Single-Line Text", State = inventory.CustomString1State, Name = inventory.CustomString1Name, MaxLength = inventory.CustomString1MaxLength, Regex = inventory.CustomString1Regex }},
+                {"cs2", new CustomFieldViewModel { FieldKey = "cs2", FieldType = "Single-Line Text", State = inventory.CustomString2State, Name = inventory.CustomString2Name, MaxLength = inventory.CustomString2MaxLength, Regex = inventory.CustomString2Regex }},
+                {"cs3", new CustomFieldViewModel { FieldKey = "cs3", FieldType = "Single-Line Text", State = inventory.CustomString3State, Name = inventory.CustomString3Name, MaxLength = inventory.CustomString3MaxLength, Regex = inventory.CustomString3Regex }},
+                {"ct1", new CustomFieldViewModel { FieldKey = "ct1", FieldType = "Multi-Line Text", State = inventory.CustomText1State, Name = inventory.CustomText1Name }},
+                {"ct2", new CustomFieldViewModel { FieldKey = "ct2", FieldType = "Multi-Line Text", State = inventory.CustomText2State, Name = inventory.CustomText2Name }},
+                {"ct3", new CustomFieldViewModel { FieldKey = "ct3", FieldType = "Multi-Line Text", State = inventory.CustomText3State, Name = inventory.CustomText3Name }},
+                {"cn1", new CustomFieldViewModel { FieldKey = "cn1", FieldType = "Numeric", State = inventory.CustomNumeric1State, Name = inventory.CustomNumeric1Name, MinValue = inventory.CustomNumeric1MinValue, MaxValue = inventory.CustomNumeric1MaxValue }},
+                {"cn2", new CustomFieldViewModel { FieldKey = "cn2", FieldType = "Numeric", State = inventory.CustomNumeric2State, Name = inventory.CustomNumeric2Name, MinValue = inventory.CustomNumeric2MinValue, MaxValue = inventory.CustomNumeric2MaxValue }},
+                {"cn3", new CustomFieldViewModel { FieldKey = "cn3", FieldType = "Numeric", State = inventory.CustomNumeric3State, Name = inventory.CustomNumeric3Name, MinValue = inventory.CustomNumeric3MinValue, MaxValue = inventory.CustomNumeric3MaxValue }},
+                {"cb1", new CustomFieldViewModel { FieldKey = "cb1", FieldType = "Checkbox (Yes/No)", State = inventory.CustomBool1State, Name = inventory.CustomBool1Name }},
+                {"cb2", new CustomFieldViewModel { FieldKey = "cb2", FieldType = "Checkbox (Yes/No)", State = inventory.CustomBool2State, Name = inventory.CustomBool2Name }},
+                {"cb3", new CustomFieldViewModel { FieldKey = "cb3", FieldType = "Checkbox (Yes/No)", State = inventory.CustomBool3State, Name = inventory.CustomBool3Name }},
+                {"cl1", new CustomFieldViewModel { FieldKey = "cl1", FieldType = "Document/Image Link", State = inventory.CustomLink1State, Name = inventory.CustomLink1Name }},
+                {"cl2", new CustomFieldViewModel { FieldKey = "cl2", FieldType = "Document/Image Link", State = inventory.CustomLink2State, Name = inventory.CustomLink2Name }},
+                {"cl3", new CustomFieldViewModel { FieldKey = "cl3", FieldType = "Document/Image Link", State = inventory.CustomLink3State, Name = inventory.CustomLink3Name }},
+                {"csel1", new CustomFieldViewModel { FieldKey = "csel1", FieldType = "Select from List", State = inventory.CustomSelect1State, Name = inventory.CustomSelect1Name, Options = inventory.CustomSelect1Options }},
+                {"csel2", new CustomFieldViewModel { FieldKey = "csel2", FieldType = "Select from List", State = inventory.CustomSelect2State, Name = inventory.CustomSelect2Name, Options = inventory.CustomSelect2Options }},
+                {"csel3", new CustomFieldViewModel { FieldKey = "csel3", FieldType = "Select from List", State = inventory.CustomSelect3State, Name = inventory.CustomSelect3Name, Options = inventory.CustomSelect3Options }},
+            };
+
+            // Determine the order
+            if (!string.IsNullOrEmpty(inventory.CustomFieldOrderJson))
+            {
+                var orderedKeys = JsonSerializer.Deserialize<List<string>>(inventory.CustomFieldOrderJson);
+                if (orderedKeys != null)
+                {
+                    foreach (var key in orderedKeys)
+                    {
+                        if (allFields.ContainsKey(key))
+                        {
+                            model.OrderedFields.Add(allFields[key]);
+                            allFields.Remove(key); // Remove to avoid duplication
+                        }
+                    }
+                }
+            }
+
+            // Add any remaining fields that weren't in the saved order
+            model.OrderedFields.AddRange(allFields.Values);
 
             return View(model);
         }

@@ -3,7 +3,7 @@
 @inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @{
-    ViewData["Title"] = "Create Inventory";
+    ViewData["Title"] = InventoriesLocalizer["Create Inventory"];
 }
 
 <h1>@InventoriesLocalizer["Create Inventory"]</h1>
@@ -14,24 +14,24 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <div class="mb-3">
-                <label asp-for="Title" class="form-label"></label>
+                <label asp-for="Title" class="form-label">@InventoriesLocalizer["Title"]</label>
                 <input asp-for="Title" class="form-control" />
                 <span asp-validation-for="Title" class="text-danger"></span>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Description" class="form-label"></label>
+                <label asp-for="Description" class="form-label">@InventoriesLocalizer["Description"]</label>
                 <textarea asp-for="Description" class="form-control" rows="4"></textarea>
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
 
             <div class="mb-3 form-check">
                 <input class="form-check-input" type="checkbox" asp-for="IsPublic" />
-                <label class="form-check-label" asp-for="IsPublic"></label>
+                <label class="form-check-label" asp-for="IsPublic">@InventoriesLocalizer["Make Public?"]</label>
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="@InventoriesLocalizer["Create"]" class="btn btn-primary" />
                 <a asp-action="Index" class="btn btn-secondary">@InventoriesLocalizer["Back to List"] </a>
             </div>
         </form>

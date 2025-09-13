@@ -50,6 +50,10 @@ namespace InventoryManagement.Infrastructure.Services
                 return string.Empty;
             }
 
+
+            // Determine if the format is dynamic (contains a random or sequence element)
+            bool isDynamic = config.Elements.Any(e => e.Type == CustomIdElementType.Sequence || e.Type == CustomIdElementType.RandomString);
+
             var idBuilder = new StringBuilder();
             var random = new Random();
 
@@ -91,7 +95,23 @@ namespace InventoryManagement.Infrastructure.Services
                 }
             }
 
-            return idBuilder.ToString();
+            string baseId = idBuilder.ToString();
+
+            // If the format is static and this is NOT a preview, we must ensure uniqueness.
+            if (!isDynamic && !isPreview)
+            {
+                // Check if this static ID already exists for this inventory.
+                bool exists = await _context.Items.AnyAsync(i => i.InventoryId == inventory.Id && i.CustomId == baseId);
+                if (exists)
+                {
+                    // If it exists, append a short random string to make it unique.
+                    const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+                    var randomSuffix = new string(Enumerable.Repeat(chars, 4).Select(s => s[random.Next(s.Length)]).ToArray());
+                    return $"{baseId}-{randomSuffix}";
+                }
+            }
+
+            return baseId;
         }
     }
 }

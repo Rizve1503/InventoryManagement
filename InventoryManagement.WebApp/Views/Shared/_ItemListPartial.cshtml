@@ -1,105 +1,37 @@
 ﻿@model List<Item>
 @using Microsoft.AspNetCore.Mvc.Localization
-@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
+@inject IViewLocalizer SharedLocalizer
 
 @{
     var inventory = ViewBag.Inventory as Inventory;
-    var currentUserId = ViewBag.CurrentUserId as int?; // This will be null for anonymous users
-
-    // Determines if a LOGGED-IN user has permission to add/like/comment.
+    var orderedFields = ViewBag.OrderedFields as List<CustomFieldViewModel>;
+    var currentUserId = ViewBag.CurrentUserId as int?;
     bool isAuthorizedUser = User.Identity.IsAuthenticated && (inventory.IsPublic || (currentUserId.HasValue && inventory.CreatorId == currentUserId.Value));
 }
 
 @if (isAuthorizedUser)
 {
     <div class="d-flex justify-content-end mb-3">
-        <a asp-controller="Items" asp-action="Create" asp-route-inventoryId="@inventory.Id" class="btn btn-success">@Localizer["Add New Item"]</a>
+        <a asp-controller="Items" asp-action="Create" asp-route-inventoryId="@inventory.Id" class="btn btn-success">@SharedLocalizer["Add New Item"]</a>
     </div>
 }
 
 <table class="table table-bordered table-striped align-middle">
     <thead class="thead-light">
         <tr>
-            @if (inventory.CustomString1State)
+            @if (orderedFields != null)
             {
-                <th>@inventory.CustomString1Name</th>
+                foreach (var field in orderedFields)
+                {
+                    if (field.State)
+                    {
+                        <th>@field.Name</th>
+                    }
+                }
             }
-            @if (inventory.CustomString2State)
-            {
-                <th>@inventory.CustomString2Name</th>
-            }
-            @if (inventory.CustomString3State)
-            {
-                <th>@inventory.CustomString3Name</th>
-            }
-
-            @if (inventory.CustomText1State)
-            {
-                <th>@inventory.CustomText1Name</th>
-            }
-            @if (inventory.CustomText2State)
-            {
-                <th>@inventory.CustomText2Name</th>
-            }
-            @if (inventory.CustomText3State)
-            {
-                <th>@inventory.CustomText3Name</th>
-            }
-
-            @if (inventory.CustomNumeric1State)
-            {
-                <th>@inventory.CustomNumeric1Name</th>
-            }
-            @if (inventory.CustomNumeric2State)
-            {
-                <th>@inventory.CustomNumeric2Name</th>
-            }
-            @if (inventory.CustomNumeric3State)
-            {
-                <th>@inventory.CustomNumeric3Name</th>
-            }
-
-            @if (inventory.CustomBool1State)
-            {
-                <th>@inventory.CustomBool1Name</th>
-            }
-            @if (inventory.CustomBool2State)
-            {
-                <th>@inventory.CustomBool2Name</th>
-            }
-            @if (inventory.CustomBool3State)
-            {
-                <th>@inventory.CustomBool3Name</th>
-            }
-
-            @if (inventory.CustomLink1State)
-            {
-                <th>@inventory.CustomLink1Name</th>
-            }
-            @if (inventory.CustomLink2State)
-            {
-                <th>@inventory.CustomLink2Name</th>
-            }
-            @if (inventory.CustomLink3State)
-            {
-                <th>@inventory.CustomLink3Name</th>
-            }
-
-            @if (inventory.CustomSelect1State)
-            {
-                <th>@inventory.CustomSelect1Name</th>
-            }
-            @if (inventory.CustomSelect2State)
-            {
-                <th>@inventory.CustomSelect2Name</th>
-            }
-            @if (inventory.CustomSelect3State)
-            {
-                <th>@inventory.CustomSelect3Name</th>
-            }
-
-            <th>@Localizer["Created"]</th>
-            <th>@Localizer["Actions"]</th>
+            <th>@SharedLocalizer["Created"]</th>
+            <th>@SharedLocalizer["Actions"]</th>
         </tr>
     </thead>
     <tbody>
@@ -109,11 +41,11 @@
                 <td colspan="100%" class="text-center text-muted">
                     @if (isAuthorizedUser)
                     {
-                        <span>@Localizer["No items have been added yet. Why not"] <a asp-controller="Items" asp-action="Create" asp-route-inventoryId="@inventory.Id">@Localizer["add one"]</a>?</span>
+                        <span>@SharedLocalizer["No items have been added yet. Why not"] <a asp-controller="Items" asp-action="Create" asp-route-inventoryId="@inventory.Id">@SharedLocalizer["add one"]</a>?</span>
                     }
                     else
                     {
-                        <span>@Localizer["No items have been added to this inventory yet."]</span>
+                        <span>@SharedLocalizer["No items have been added to this inventory yet."]</span>
                     }
                 </td>
             </tr>
@@ -123,92 +55,51 @@
             @foreach (var item in Model)
             {
                 <tr>
-                    @if (inventory.CustomString1State)
+                    @if (orderedFields != null)
                     {
-                        <td>@item.CustomString1Value</td>
+                        foreach (var field in orderedFields)
+                        {
+                            if (field.State)
+                            {
+                                <td>
+                                    @switch (field.FieldType)
+                                    {
+                                        case "Single-Line Text":
+                                            @item.GetType().GetProperty(field.FieldKey.Replace("cs", "CustomString") + "Value")?.GetValue(item)
+                                            break;
+                                        case "Multi-Line Text":
+                                            @item.GetType().GetProperty(field.FieldKey.Replace("ct", "CustomText") + "Value")?.GetValue(item)
+                                            break;
+                                        case "Numeric":
+                                            @item.GetType().GetProperty(field.FieldKey.Replace("cn", "CustomNumeric") + "Value")?.GetValue(item)
+                                            break;
+                                        case "Select from List":
+                                            @item.GetType().GetProperty(field.FieldKey.Replace("csel", "CustomSelect") + "Value")?.GetValue(item)
+                                            break;
+                                        case "Checkbox (Yes/No)":
+                                            var boolValue = (bool?)item.GetType().GetProperty(field.FieldKey.Replace("cb", "CustomBool") + "Value")?.GetValue(item);
+                                            @(boolValue == true ? SharedLocalizer["Yes"] : SharedLocalizer["No"])
+                                            break;
+                                        case "Document/Image Link":
+                                            var linkValue = (string?)item.GetType().GetProperty(field.FieldKey.Replace("cl", "CustomLink") + "Value")?.GetValue(item);
+                                            if (!string.IsNullOrEmpty(linkValue))
+                                            {
+                                                <a href="@linkValue" target="_blank">@SharedLocalizer["Link"]</a>
+                                            }
+                                            break;
+                                    }
+                                </td>
+                            }
+                        }
                     }
-                    @if (inventory.CustomString2State)
-                    {
-                        <td>@item.CustomString2Value</td>
-                    }
-                    @if (inventory.CustomString3State)
-                    {
-                        <td>@item.CustomString3Value</td>
-                    }
-
-                    @if (inventory.CustomText1State)
-                    {
-                        <td>@item.CustomText1Value</td>
-                    }
-                    @if (inventory.CustomText2State)
-                    {
-                        <td>@item.CustomText2Value</td>
-                    }
-                    @if (inventory.CustomText3State)
-                    {
-                        <td>@item.CustomText3Value</td>
-                    }
-
-                    @if (inventory.CustomNumeric1State)
-                    {
-                        <td>@item.CustomNumeric1Value</td>
-                    }
-                    @if (inventory.CustomNumeric2State)
-                    {
-                        <td>@item.CustomNumeric2Value</td>
-                    }
-                    @if (inventory.CustomNumeric3State)
-                    {
-                        <td>@item.CustomNumeric3Value</td>
-                    }
-
-                    @if (inventory.CustomBool1State)
-                    {
-                        <td>@(item.CustomBool1Value == true ? "Yes" : "No")</td>
-                    }
-                    @if (inventory.CustomBool2State)
-                    {
-                        <td>@(item.CustomBool2Value == true ? "Yes" : "No")</td>
-                    }
-                    @if (inventory.CustomBool3State)
-                    {
-                        <td>@(item.CustomBool3Value == true ? "Yes" : "No")</td>
-                    }
-
-                    @if (inventory.CustomLink1State)
-                    {
-                        <td><a href="@item.CustomLink1Value" target="_blank">@Localizer["Link"]</a></td>
-                    }
-                    @if (inventory.CustomLink2State)
-                    {
-                        <td><a href="@item.CustomLink2Value" target="_blank">@Localizer["Link"]</a></td>
-                    }
-                    @if (inventory.CustomLink3State)
-                    {
-                        <td><a href="@item.CustomLink3Value" target="_blank">@Localizer["Link"]</a></td>
-                    }
-
-                    @if (inventory.CustomSelect1State)
-                    {
-                        <td>@item.CustomSelect1Value</td>
-                    }
-                    @if (inventory.CustomSelect2State)
-                    {
-                        <td>@item.CustomSelect2Value</td>
-                    }
-                    @if (inventory.CustomSelect3State)
-                    {
-                        <td>@item.CustomSelect3Value</td>
-                    }
-
                     <td>@item.CreatedAt.ToShortDateString()</td>
                     <td>
                         @{
                             var userHasLiked = currentUserId.HasValue && item.Likes.Any(l => l.UserId == currentUserId.Value);
                             var buttonClass = userHasLiked ? "btn-primary" : "btn-outline-primary";
                         }
-                        <button class="btn btn-sm @buttonClass like-btn" data-item-id="@item.Id" @(User.Identity.IsAuthenticated ? "" : "disabled") title="You must be logged in to like items">
-                            <i class="bi bi-hand-thumbs-up"></i>@Localizer[" Like "]<span class="badge bg-light text-dark like-count">@item.Likes.Count</span>
+                        <button class="btn btn-sm @buttonClass like-btn" data-item-id="@item.Id" @(User.Identity.IsAuthenticated ? "" : "disabled") title="@(User.Identity.IsAuthenticated? SharedLocalizer["Like"] : SharedLocalizer["You must be logged in to like items"])">
+                            <i class="bi bi-hand-thumbs-up"></i> @SharedLocalizer["Like"] <span class="badge bg-light text-dark like-count">@item.Likes.Count</span>
                         </button>
                     </td>
                 </tr>

@@ -129,16 +129,25 @@
   <data name="Created" xml:space="preserve">
     <value>Creado</value>
   </data>
+  <data name="Item added!" xml:space="preserve">
+    <value>¡Artículo añadido!</value>
+  </data>
   <data name="Like" xml:space="preserve">
-    <value>Como</value>
+    <value>Me gusta</value>
   </data>
   <data name="Link" xml:space="preserve">
     <value>Enlace</value>
+  </data>
+  <data name="No" xml:space="preserve">
+    <value>No</value>
   </data>
   <data name="No items have been added to this inventory yet." xml:space="preserve">
     <value>Todavía no se han agregado artículos a este inventario.</value>
   </data>
   <data name="No items have been added yet. Why not" xml:space="preserve">
     <value>Aún no se han añadido artículos. ¿Por qué no?</value>
+  </data>
+  <data name="Yes" xml:space="preserve">
+    <value>Sí</value>
   </data>
 </root>

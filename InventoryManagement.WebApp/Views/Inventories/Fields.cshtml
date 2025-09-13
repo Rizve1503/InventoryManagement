@@ -1,9 +1,9 @@
-﻿@model CustomFieldsViewModel
+﻿@model CustomFieldsPageViewModel
 @using Microsoft.AspNetCore.Mvc.Localization
 @inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @{
-    ViewData["Title"] = "Custom Fields";
+    ViewData["Title"] = InventoriesLocalizer["Custom Fields"];
 }
 
 <nav aria-label="breadcrumb">
@@ -27,87 +27,83 @@
 <form asp-action="Fields" asp-route-id="@Model.InventoryId" method="post">
     @Html.HiddenFor(m => m.InventoryId)
     @Html.HiddenFor(m => m.RowVersion)
+    <input type="hidden" asp-for="FieldOrderJson" id="fieldOrderJsonInput" />
     <div asp-validation-summary="All" class="text-danger mb-3"></div>
 
-    <div class="row">
-        <!-- Single-Line Text Fields -->
-        <div class="col-lg-4 col-md-6 mb-3">
-            <h5><i class="bi bi-fonts"></i> @InventoriesLocalizer["Single-Line Text"]</h5>
-            <div class="card p-3 mb-2">
-                <div class="form-check form-switch mb-2"><input asp-for="CustomString1State" class="form-check-input"><label asp-for="CustomString1State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 1</label></div>
-                <input asp-for="CustomString1Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Model')">
-                <input asp-for="CustomString1MaxLength" class="form-control form-control-sm" placeholder="Max Length (optional)">
-                <input asp-for="CustomString1Regex" class="form-control form-control-sm mt-1" placeholder="Regex Pattern (optional)">
-            </div>
-            <div class="card p-3 mb-2">
-                <div class="form-check form-switch mb-2"><input asp-for="CustomString2State" class="form-check-input"><label asp-for="CustomString2State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 2</label></div>
-                <input asp-for="CustomString2Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Serial #')">
-                <input asp-for="CustomString2MaxLength" class="form-control form-control-sm" placeholder="Max Length (optional)">
-                <input asp-for="CustomString2Regex" class="form-control form-control-sm mt-1" placeholder="Regex Pattern (optional)">
-            </div>
-            <div class="card p-3 mb-2">
-                <div class="form-check form-switch mb-2"><input asp-for="CustomString3State" class="form-check-input"><label asp-for="CustomString3State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 3</label></div>
-                <input asp-for="CustomString3Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Color')">
-                <input asp-for="CustomString3MaxLength" class="form-control form-control-sm" placeholder="Max Length (optional)">
-                <input asp-for="CustomString3Regex" class="form-control form-control-sm mt-1" placeholder="Regex Pattern (optional)">
-            </div>
-        </div>
+    <div class="row" id="fields-container">
+        @for (var i = 0; i < Model.Fields.Count; i++)
+        {
+            var field = Model.Fields[i];
+            <div class="col-lg-4 col-md-6 mb-3 field-card" data-key="@field.FieldKey">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <i class="bi bi-grip-vertical" style="cursor: grab;"></i>
+                        <strong>@InventoriesLocalizer[field.FieldType]</strong>
+                    </div>
+                    <div class="card-body">
+                        <input type="hidden" asp-for="Fields[i].FieldKey" />
+                        <input type="hidden" asp-for="Fields[i].FieldType" />
 
-        <!-- Multi-Line Text Fields -->
-        <div class="col-lg-4 col-md-6 mb-3">
-            <h5><i class="bi bi-textarea-t"></i> @InventoriesLocalizer["Multi-Line Text"]</h5>
-            <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomText1State" class="form-check-input"><label asp-for="CustomText1State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 1</label></div><input asp-for="CustomText1Name" class="form-control" placeholder="Field Name (e.g., 'Notes')"></div>
-            <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomText2State" class="form-check-input"><label asp-for="CustomText2State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 2</label></div><input asp-for="CustomText2Name" class="form-control" placeholder="Field Name (e.g., 'Description')"></div>
-            <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomText3State" class="form-check-input"><label asp-for="CustomText3State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 3</label></div><input asp-for="CustomText3Name" class="form-control" placeholder="Field Name (e.g., 'Comments')"></div>
-        </div>
+                        <div class="form-check form-switch mb-2">
+                            <input asp-for="Fields[i].State" class="form-check-input" />
+                            <label asp-for="Fields[i].State" class="form-check-label small">Enable Field</label>
+                        </div>
 
-        <!-- Numeric Fields -->
-        <div class="col-lg-4 col-md-6 mb-3">
-            <h5><i class="bi bi-hash"></i> @InventoriesLocalizer["Numeric"]</h5>
-            <div class="card p-3 mb-2">
-                <div class="form-check form-switch mb-2"><input asp-for="CustomNumeric1State" class="form-check-input"><label asp-for="CustomNumeric1State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 1</label></div>
-                <input asp-for="CustomNumeric1Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Price')">
-                <div class="input-group input-group-sm"><input asp-for="CustomNumeric1MinValue" class="form-control" placeholder="Min Value"><input asp-for="CustomNumeric1MaxValue" class="form-control" placeholder="Max Value"></div>
+                        <input asp-for="Fields[i].Name" class="form-control mb-2" placeholder="Field Name" />
+
+                        @if (field.FieldType == "Single-Line Text")
+                        {
+                            <input asp-for="Fields[i].MaxLength" class="form-control form-control-sm" placeholder="Max Length (optional)">
+                            <input asp-for="Fields[i].Regex" class="form-control form-control-sm mt-1" placeholder="Regex Pattern (optional)">
+                        }
+                        else if (field.FieldType == "Numeric")
+                        {
+                            <div class="input-group input-group-sm">
+                                <input asp-for="Fields[i].MinValue" class="form-control" placeholder="Min Value">
+                                <input asp-for="Fields[i].MaxValue" class="form-control" placeholder="Max Value">
+                            </div>
+                        }
+                        else if (field.FieldType == "Select from List")
+                        {
+                            <textarea asp-for="Fields[i].Options" class="form-control" placeholder="Options, comma-separated" rows="2"></textarea>
+                        }
+                    </div>
+                </div>
             </div>
-            <div class="card p-3 mb-2">
-                    <div class="form-check form-switch mb-2"><input asp-for="CustomNumeric2State" class="form-check-input"><label asp-for="CustomNumeric2State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 2</label></div>
-                <input asp-for="CustomNumeric2Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Quantity')">
-                <div class="input-group input-group-sm"><input asp-for="CustomNumeric2MinValue" class="form-control" placeholder="Min Value"><input asp-for="CustomNumeric2MaxValue" class="form-control" placeholder="Max Value"></div>
-            </div>
-            <div class="card p-3 mb-2">
-                    <div class="form-check form-switch mb-2"><input asp-for="CustomNumeric3State" class="form-check-input"><label asp-for="CustomNumeric3State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 3</label></div>
-                <input asp-for="CustomNumeric3Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Weight')">
-                <div class="input-group input-group-sm"><input asp-for="CustomNumeric3MinValue" class="form-control" placeholder="Min Value"><input asp-for="CustomNumeric3MaxValue" class="form-control" placeholder="Max Value"></div>
-            </div>
-        </div>
-
-        <!-- Boolean Fields -->
-        <div class="col-lg-4 col-md-6 mb-3">
-                <h5><i class="bi bi-check2-square"></i> @InventoriesLocalizer["Checkbox (Yes/No)"]</h5>
-                <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomBool1State" class="form-check-input"><label asp-for="CustomBool1State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 1</label></div><input asp-for="CustomBool1Name" class="form-control" placeholder="Field Name (e.g., 'In Stock')"></div>
-                <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomBool2State" class="form-check-input"><label asp-for="CustomBool2State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 2</label></div><input asp-for="CustomBool2Name" class="form-control" placeholder="Field Name (e.g., 'Requires Power')"></div>
-                <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomBool3State" class="form-check-input"><label asp-for="CustomBool3State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 3</label></div><input asp-for="CustomBool3Name" class="form-control" placeholder="Field Name (e.g., 'Active')"></div>
-        </div>
-
-        <!-- Link Fields -->
-        <div class="col-lg-4 col-md-6 mb-3">
-            <h5><i class="bi bi-link-45deg"></i> @InventoriesLocalizer["Document/Image Link"]</h5>
-            <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomLink1State" class="form-check-input"><label asp-for="CustomLink1State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 1</label></div><input asp-for="CustomLink1Name" class="form-control" placeholder="Field Name (e.g., 'Manual URL')"></div>
-            <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomLink2State" class="form-check-input"><label asp-for="CustomLink2State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 2</label></div><input asp-for="CustomLink2Name" class="form-control" placeholder="Field Name (e.g., 'Datasheet')"></div>
-            <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomLink3State" class="form-check-input"><label asp-for="CustomLink3State" class="form-check-label small">@InventoriesLocalizer["Enable Field"] 3</label></div><input asp-for="CustomLink3Name" class="form-control" placeholder="Field Name (e.g., 'Project Site')"></div>
-        </div>
-
-        <!-- Select from List Fields -->
-        <div class="col-lg-4 col-md-6 mb-3">
-             <h5><i class="bi bi-card-checklist"></i> @InventoriesLocalizer["Select from List"]</h5>
-             <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomSelect1State" class="form-check-input"><label asp-for="CustomSelect1State" class="form-check-label small">@InventoriesLocalizer["Enable Field 1"]</label></div><input asp-for="CustomSelect1Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Status')"><textarea asp-for="CustomSelect1Options" class="form-control" placeholder="Options, comma-separated" rows="2"></textarea></div>
-             <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomSelect2State" class="form-check-input"><label asp-for="CustomSelect2State" class="form-check-label small">@InventoriesLocalizer["Enable Field 2"]</label></div><input asp-for="CustomSelect2Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Condition')"><textarea asp-for="CustomSelect2Options" class="form-control" placeholder="New,Used,Refurbished" rows="2"></textarea></div>
-             <div class="card p-3 mb-2"><div class="form-check form-switch mb-2"><input asp-for="CustomSelect3State" class="form-check-input"><label asp-for="CustomSelect3State" class="form-check-label small">@InventoriesLocalizer["Enable Field 3"]</label></div><input asp-for="CustomSelect3Name" class="form-control mb-2" placeholder="Field Name (e.g., 'Location')"><textarea asp-for="CustomSelect3Options" class="form-control" placeholder="Building A,Building B" rows="2"></textarea></div>
-        </div>
+        }
     </div>
 
     <div class="form-group mt-4">
-         <button type="submit" class="btn btn-primary">@InventoriesLocalizer["Save Fields"]</button>
-         <a asp-action="Index" class="btn btn-secondary">@InventoriesLocalizer["Back to Inventories"]</a>
+        <button type="submit" class="btn btn-primary">@InventoriesLocalizer["Save Fields"]</button>
+        <a asp-action="Index" class="btn btn-secondary">@InventoriesLocalizer["Back to Inventories"]</a>
     </div>
 </form>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const container = document.getElementById('fields-container');
+            const orderInput = document.getElementById('fieldOrderJsonInput');
+
+            function serializeOrder() {
+                const keys = [];
+                container.querySelectorAll('.field-card').forEach(card => {
+                    keys.push(card.dataset.key);
+                });
+                orderInput.value = JSON.stringify(keys);
+            }
+
+            new Sortable(container, {
+                animation: 150,
+                handle: '.bi-grip-vertical', // Use a handle to initiate drag
+                onUpdate: function () {
+                    serializeOrder();
+                }
+            });
+
+            // Set initial order on page load
+            serializeOrder();
+        });
+    </script>
+}

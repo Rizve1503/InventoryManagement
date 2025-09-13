@@ -123,6 +123,12 @@
   <data name="Add New Item" xml:space="preserve">
     <value>Añadir Nuevo Artículo</value>
   </data>
+  <data name="Add New Item to" xml:space="preserve">
+    <value>Agregar nuevo artículo a</value>
+  </data>
+  <data name="Add New Item to {0}" xml:space="preserve">
+    <value>Añadir Nuevo Artículo a {0}</value>
+  </data>
   <data name="Back to Inventories" xml:space="preserve">
     <value>Volver a Inventarios</value>
   </data>
@@ -138,6 +144,9 @@
   <data name="Create Inventory" xml:space="preserve">
     <value>Crear inventario</value>
   </data>
+  <data name="Create Item" xml:space="preserve">
+    <value>Crear artículo</value>
+  </data>
   <data name="Create New Inventory" xml:space="preserve">
     <value>Crear Nuevo Inventario</value>
   </data>
@@ -149,6 +158,9 @@
   </data>
   <data name="Created on" xml:space="preserve">
     <value>Creado el</value>
+  </data>
+  <data name="Current Image" xml:space="preserve">
+    <value>Imagen Actual</value>
   </data>
   <data name="Custom Fields for" xml:space="preserve">
     <value>Campos Personalizados para</value>
@@ -221,6 +233,9 @@
   </data>
   <data name="Inventory Image" xml:space="preserve">
     <value>Imagen del Inventario</value>
+  </data>
+  <data name="Item added!" xml:space="preserve">
+    <value>¡Artículo añadido!</value>
   </data>
   <data name="Items" xml:space="preserve">
     <value>Artículos</value>
