@@ -117,28 +117,28 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Admin Panel" xml:space="preserve">
-    <value>Panel de Administración</value>
+  <data name="Actions" xml:space="preserve">
+    <value>Comportamiento</value>
   </data>
-  <data name="Hello" xml:space="preserve">
-    <value>Hola</value>
+  <data name="Add New Item" xml:space="preserve">
+    <value>Agregar nuevo artículo</value>
   </data>
-  <data name="Home" xml:space="preserve">
-    <value>Inicio</value>
+  <data name="add one" xml:space="preserve">
+    <value>añadir uno</value>
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Iniciar Sesión</value>
+  <data name="Created" xml:space="preserve">
+    <value>Creado</value>
   </data>
-  <data name="Logout" xml:space="preserve">
-    <value>Cerrar Sesión</value>
+  <data name="Like" xml:space="preserve">
+    <value>Como</value>
   </data>
-  <data name="My Inventories" xml:space="preserve">
-    <value>Mis Inventarios</value>
+  <data name="Link" xml:space="preserve">
+    <value>Enlace</value>
   </data>
-  <data name="Register" xml:space="preserve">
-    <value>Registrarse</value>
+  <data name="No items have been added to this inventory yet." xml:space="preserve">
+    <value>Todavía no se han agregado artículos a este inventario.</value>
   </data>
-  <data name="Search" xml:space="preserve">
-    <value>Buscar</value>
+  <data name="No items have been added yet. Why not" xml:space="preserve">
+    <value>Aún no se han añadido artículos. ¿Por qué no?</value>
   </data>
 </root>

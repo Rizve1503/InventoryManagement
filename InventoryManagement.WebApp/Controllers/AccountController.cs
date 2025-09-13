@@ -89,6 +89,85 @@ namespace InventoryManagement.WebApp.Controllers
             return View(model);
         }
 
+        // --- The following new actions to Handle External Logins  ---
+
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public IActionResult ExternalLogin(string provider, string? returnUrl = null)
+        {
+            // Request a redirect to the external login provider.
+            var redirectUrl = Url.Action(nameof(ExternalLoginCallback), "Account", new { returnUrl });
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(properties, provider);
+        }
+
+        [AllowAnonymous]
+        public async Task<IActionResult> ExternalLoginCallback(string? returnUrl = null, string? remoteError = null)
+        {
+            if (remoteError != null)
+            {
+                ModelState.AddModelError(string.Empty, $"Error from external provider: {remoteError}");
+                return View(nameof(Login));
+            }
+
+            var info = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            if (info?.Principal == null)
+            {
+                return RedirectToAction(nameof(Login));
+            }
+
+            // --- Find or Create User Logic ---
+            var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+            if (string.IsNullOrEmpty(email))
+            {
+                // Provider did not return an email. Handle this error.
+                TempData["ErrorMessage"] = "Could not retrieve email from the provider. Please register manually.";
+                return RedirectToAction(nameof(Login));
+            }
+
+            var user = await _context.Users.Include(u => u.Role).FirstOrDefaultAsync(u => u.Email == email);
+
+            if (user == null) // User does not exist, create a new one
+            {
+                var userName = info.Principal.FindFirstValue(ClaimTypes.Name) ?? email.Split('@')[0];
+                var userRole = await _context.Roles.FirstAsync(r => r.Name == "User");
+
+                user = new User
+                {
+                    Email = email,
+                    Name = userName,
+                    RoleId = userRole.Id,
+                    PasswordHash = "" // No password for social logins
+                };
+                _context.Users.Add(user);
+                await _context.SaveChangesAsync();
+
+                // Re-fetch user to include the Role for the claims principal
+                user = await _context.Users.Include(u => u.Role).FirstAsync(u => u.Email == email);
+            }
+
+            if (user.IsBlocked)
+            {
+                ModelState.AddModelError(string.Empty, "This account has been blocked.");
+                return View(nameof(Login));
+            }
+
+            // --- Sign the user in with our application's cookie ---
+            var claims = new List<Claim>
+    {
+        new Claim(ClaimTypes.Name, user.Name),
+        new Claim(ClaimTypes.Email, user.Email),
+        new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+        new Claim(ClaimTypes.Role, user.Role?.Name ?? "User")
+    };
+
+            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+            return RedirectToLocal(returnUrl);
+        }
+
         [HttpGet]
         public IActionResult Register()
         {

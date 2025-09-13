@@ -1,4 +1,6 @@
 ﻿@model ItemViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @{
     ViewData["Title"] = $"Add New Item to {Model.Inventory?.Title}";
@@ -160,7 +162,7 @@
                 <div class="mb-3">
                     <label class="form-label">@Model.Inventory.CustomSelect1Name</label>
                     <select name="Item.CustomSelect1Value" class="form-select">
-                        <option value="">-- Select --</option>
+                        <option value="">-- @InventoriesLocalizer["Select"] --</option>
                         @foreach (var option in options)
                         {
                             <option value="@option">@option</option>
@@ -174,7 +176,7 @@
                 <div class="mb-3">
                     <label class="form-label">@Model.Inventory.CustomSelect2Name</label>
                     <select name="Item.CustomSelect2Value" class="form-select">
-                        <option value="">-- Select --</option>
+                        <option value="">-- @InventoriesLocalizer["Select"] --</option>
                         @foreach (var option in options)
                         {
                             <option value="@option">@option</option>
@@ -188,7 +190,7 @@
                 <div class="mb-3">
                     <label class="form-label">@Model.Inventory.CustomSelect3Name</label>
                     <select name="Item.CustomSelect3Value" class="form-select">
-                        <option value="">-- Select --</option>
+                        <option value="">-- @InventoriesLocalizer["Select"] --</option>
                         @foreach (var option in options)
                         {
                             <option value="@option">@option</option>
@@ -201,7 +203,7 @@
 
     <div class="form-group mt-3">
         <input type="submit" value="Create Item" class="btn btn-primary" />
-        <a asp-controller="Inventories" asp-action="Details" asp-route-id="@Model.InventoryId" class="btn btn-secondary">Cancel</a>
+        <a asp-controller="Inventories" asp-action="Details" asp-route-id="@Model.InventoryId" class="btn btn-secondary">@InventoriesLocalizer["Cancel"]</a>
     </div>
 </form>
 

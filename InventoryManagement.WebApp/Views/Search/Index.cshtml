@@ -1,4 +1,6 @@
 ﻿@model SearchViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
     ViewData["Title"] = $"Search Results for '{Model.Query}'";
@@ -9,14 +11,14 @@
 
 @if (!Model.FoundInventories.Any() && !Model.FoundItems.Any())
 {
-    <p class="text-muted">No results found.</p>
+    <p class="text-muted">@Localizer["No results found."]</p>
 }
 else
 {
     <!-- Display Found Inventories -->
     @if (Model.FoundInventories.Any())
     {
-        <h4 class="mt-4">Found in Inventories (@Model.FoundInventories.Count)</h4>
+        <h4 class="mt-4">@Localizer["Found in Inventories"] (@Model.FoundInventories.Count)</h4>
         <div class="list-group">
             @foreach (var inventory in Model.FoundInventories)
             {
@@ -34,13 +36,13 @@ else
     <!-- Display Found Items -->
     @if (Model.FoundItems.Any())
     {
-        <h4 class="mt-4">Found in Items (@Model.FoundItems.Count)</h4>
+        <h4 class="mt-4">@Localizer["Found in Items"] (@Model.FoundItems.Count)</h4>
         <div class="list-group">
             @foreach (var result in Model.FoundItems)
             {
                 <a asp-controller="Inventories" asp-action="Details" asp-route-id="@result.InventoryId" class="list-group-item list-group-item-action">
                     <h5 class="mb-1">Item in "@result.InventoryTitle"</h5>
-                    <small class="text-muted">An item's content matched your search. Click to view the full inventory.</small>
+                    <small class="text-muted">@Localizer["An item's content matched your search. Click to view the full inventory."]</small>
                     @* In a more advanced view, we could show which field matched *@
                 </a>
             }

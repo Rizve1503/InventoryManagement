@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<InventoryManagement.Domain.Entities.Inventory>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @foreach (var item in Model)
 {
@@ -10,25 +12,25 @@
         <td>
             @if (item.IsPublic)
             {
-                <span class="badge bg-success">Public</span>
+                <span class="badge bg-success">@InventoriesLocalizer["Public"] </span>
             }
             else
             {
-                <span class="badge bg-secondary">Private</span>
+                <span class="badge bg-secondary">@InventoriesLocalizer["Private"] </span>
             }
         </td>
         <td>@item.Items.Count</td>
         <td>@item.CreatedAt.ToShortDateString()</td>
         <td>
             <div class="dropdown">
-                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">Actions</button>
+                <button class="btn btn-sm btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">@InventoriesLocalizer["Actions"] </button>
                 <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Details" asp-route-id="@item.Id">View</a></li>
-                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Edit" asp-route-id="@item.Id">Settings</a></li>
-                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Fields" asp-route-id="@item.Id">Fields</a></li>
-                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="CustomId" asp-route-id="@item.Id">Custom ID</a></li>
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Details" asp-route-id="@item.Id">@InventoriesLocalizer["View"] </a></li>
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Edit" asp-route-id="@item.Id">@InventoriesLocalizer["Settings"] </a></li>
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="Fields" asp-route-id="@item.Id">@InventoriesLocalizer["Fields"] </a></li>
+                    <li><a class="dropdown-item" asp-controller="Inventories" asp-action="CustomId" asp-route-id="@item.Id">@InventoriesLocalizer["Custom ID"] </a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" asp-controller="Inventories" asp-action="Delete" asp-route-id="@item.Id">Delete</a></li>
+                    <li><a class="dropdown-item text-danger" asp-controller="Inventories" asp-action="Delete" asp-route-id="@item.Id">@InventoriesLocalizer["Delete"] </a></li>
                 </ul>
             </div>
         </td>

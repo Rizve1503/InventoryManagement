@@ -30,6 +30,7 @@ namespace InventoryManagement.WebApp.Controllers
 
                 // Get the top 5 inventories based on the number of items they contain
                 TopInventories = await _context.Inventories
+                    .Include(i => i.Items)
                     .Where(i => i.IsPublic)
                     .OrderByDescending(i => i.Items.Count)
                     .Take(5)

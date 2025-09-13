@@ -1,10 +1,12 @@
 ﻿@model InventoryManagement.WebApp.ViewModels.InventoryViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @{
     ViewData["Title"] = "Create Inventory";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>@InventoriesLocalizer["Create Inventory"]</h1>
 <hr />
 <div class="row">
     <div class="col-md-6">
@@ -30,7 +32,7 @@
 
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
-                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+                <a asp-action="Index" class="btn btn-secondary">@InventoriesLocalizer["Back to List"] </a>
             </div>
         </form>
     </div>

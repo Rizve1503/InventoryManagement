@@ -1,4 +1,6 @@
 ﻿@model IEnumerable<InventoryManagement.Domain.Entities.Inventory>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @{
     ViewData["Title"] = "My Inventories";
@@ -6,19 +8,19 @@
 }
 
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>@ViewData["Title"]</h1>
+    <h1>@InventoriesLocalizer["My Inventories"]</h1>
     <div>
         <div class="btn-group" role="group">
             <button id="list-view-btn" type="button" class="btn @(viewType == "list" ? "btn-primary" : "btn-outline-primary")"><i class="bi bi-list-ul"></i></button>
             <button id="card-view-btn" type="button" class="btn @(viewType == "card" ? "btn-primary" : "btn-outline-primary")"><i class="bi bi-grid-3x3-gap-fill"></i></button>
         </div>
-        <a asp-action="Create" class="btn btn-success ms-2">Create New Inventory</a>
+        <a asp-action="Create" class="btn btn-success ms-2">@InventoriesLocalizer["Create New Inventory"]</a>
     </div>
 </div>
 
 @if (!Model.Any())
 {
-    <div class="text-center mt-5"><p class="lead">You haven't created any inventories yet.</p></div>
+    <div class="text-center mt-5"><p class="lead">@InventoriesLocalizer["You haven't created any inventories yet."]</p></div>
 }
 else
 {
@@ -27,10 +29,10 @@ else
         <table class="table table-hover align-middle">
             <thead class="thead-light">
                 <tr>
-                    <th>Title & Description</th>
-                    <th>Status</th>
-                    <th>Items</th>
-                    <th>Created</th>
+                    <th>@InventoriesLocalizer["Title & Description"]</th>
+                    <th>@InventoriesLocalizer["Status"]</th>
+                    <th>@InventoriesLocalizer["Items"]</th>
+                    <th>@InventoriesLocalizer["Created"]</th>
                     <th></th>
                 </tr>
             </thead>
@@ -49,7 +51,7 @@ else
     @if (ViewBag.HasMoreInventories == true)
     {
         <div id="loading-indicator" class="text-center my-4" style="display: none;">
-            <div class="spinner-border text-primary" role="status"><span class="visually-hidden">Loading...</span></div>
+            <div class="spinner-border text-primary" role="status"><span class="visually-hidden">@InventoriesLocalizer["Loading"]...</span></div>
         </div>
     }
 }

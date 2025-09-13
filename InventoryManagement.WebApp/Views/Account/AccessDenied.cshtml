@@ -1,10 +1,13 @@
-﻿@{
-    ViewData["Title"] = "Access Denied";
+﻿@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.AccountController> Localizer
+
+@{
+    ViewData["Title"] = Localizer["Access Denied"];
     Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <div class="text-center mt-5">
-    <h1 class="display-4 text-danger">Access Denied</h1>
-    <p class="lead">You do not have permission to view this resource.</p>
-    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">Go to Home Page</a>
+    <h1 class="display-4 text-danger">@Localizer["Access Denied"]</h1>
+    <p class="lead">@Localizer["You do not have permission to view this resource."]</p>
+    <a asp-controller="Home" asp-action="Index" class="btn btn-primary">@Localizer["Go to Home Page"]</a>
 </div>

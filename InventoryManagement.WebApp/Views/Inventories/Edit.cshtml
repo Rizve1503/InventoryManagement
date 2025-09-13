@@ -1,10 +1,12 @@
 ﻿@model InventoryManagement.WebApp.ViewModels.InventoryViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @{
     ViewData["Title"] = "Edit Inventory";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1> @InventoriesLocalizer["Edit Inventory"]</h1>
 <hr />
 <div class="row">
     <div class="col-md-6">

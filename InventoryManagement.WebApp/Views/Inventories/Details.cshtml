@@ -1,21 +1,27 @@
 ﻿@model Inventory
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
+
 @{
     ViewData["Title"] = Model.Title;
 }
 <h1>@Model.Title</h1>
-<p class="text-muted">Created by: @Model.Creator?.Name on @Model.CreatedAt.ToShortDateString()</p>
+<p class="text-muted">@InventoriesLocalizer["Created by:"] @Model.Creator?.Name on @Model.CreatedAt.ToShortDateString()</p>
 <p>@Model.Description</p>
 <hr />
 <div class="mt-4">
     <ul class="nav nav-tabs mb-3" id="inventoryTab" role="tablist">
         <li class="nav-item" role="presentation">
-            <button class="nav-link active" id="items-tab" data-bs-toggle="tab" data-bs-target="#items" type="button" role="tab" aria-controls="items" aria-selected="true">Items</button>
+            <button class="nav-link active" id="items-tab" data-bs-toggle="tab" data-bs-target="#items" type="button" role="tab" aria-controls="items" aria-selected="true">@InventoriesLocalizer["Items"]</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="discussion-tab" data-bs-toggle="tab" data-bs-target="#discussion" type="button" role="tab" aria-controls="discussion" aria-selected="false">Discussion</button>
+            <button class="nav-link" id="discussion-tab" data-bs-toggle="tab" data-bs-target="#discussion" type="button" role="tab" aria-controls="discussion" aria-selected="false">@InventoriesLocalizer["Discussion"]</button>
         </li>
         <li class="nav-item" role="presentation">
-            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab" aria-controls="stats" aria-selected="false">Stats</button>
+            <button class="nav-link" id="stats-tab" data-bs-toggle="tab" data-bs-target="#stats" type="button" role="tab" aria-controls="stats" aria-selected="false">@InventoriesLocalizer["Stats"]</button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="export-tab" data-bs-toggle="tab" data-bs-target="#export" type="button" role="tab" aria-controls="export" aria-selected="false">@InventoriesLocalizer["Export"]</button>
         </li>
     </ul>
     <div class="tab-content" id="inventoryTabContent">
@@ -31,25 +37,35 @@
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="InventoryId" value="@Model.Id" />
                         <div class="mb-3">
-                            <label for="comment-content" class="form-label">Leave a comment</label>
+                            <label for="comment-content" class="form-label">@InventoriesLocalizer["Leave a comment"]</label>
                             <textarea id="comment-content" name="Content" class="form-control" rows="3" required></textarea>
                         </div>
-                        <button type="submit" class="btn btn-primary">Post Comment</button>
+                        <button type="submit" class="btn btn-primary">@InventoriesLocalizer["Post Comment"]</button>
                     </form>
                 }
                 else
                 {
-                    <div class="alert alert-info"><a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">Sign in</a> to post a comment.</div>
+                    <div class="alert alert-info"><a asp-controller="Account" asp-action="Login" asp-route-returnUrl="@Context.Request.Path">@InventoriesLocalizer["Sign in"]</a> @InventoriesLocalizer["to post a comment."]</div>
                 }
             </div>
         </div>
         <div class="tab-pane fade" id="stats" role="tabpanel" aria-labelledby="stats-tab">
             <div class="p-3" id="stats-container"><div class="text-center"><div class="spinner-border"></div></div></div>
         </div>
+        <div class="tab-pane fade" id="export" role="tabpanel" aria-labelledby="export-tab">
+            <div class="p-3">
+                <h4>@InventoriesLocalizer["Export Inventory Data"]</h4>
+                <p>@InventoriesLocalizer["Export all items and their custom field data from this inventory into a CSV file, which can be opened in Excel or other spreadsheet software."]</p>
+                <a asp-action="ExportAsCsv" asp-route-inventoryId="@Model.Id" class="btn btn-primary">
+                    <i class="bi bi-download"></i> @InventoriesLocalizer["Export to CSV"]
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         $(document).ready(function() {
         const inventoryId = @Model.Id;

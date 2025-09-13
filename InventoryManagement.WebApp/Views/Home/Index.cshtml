@@ -1,18 +1,21 @@
 ﻿@model HomeViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.HomeController> HomeControllerLocalizer
 
 @{
     ViewData["Title"] = "Home Page";
 }
 
 <div class="jumbotron bg-light p-5 rounded-lg mb-4">
-    <h1 class="display-4">@Localizer["Welcome to Inventra!"]</h1>
-    <p class="lead">Your modern solution for collaborative inventory management.</p>
+    <h1 class="display-4">@HomeControllerLocalizer["Welcome to Inventra!"]</h1>
+    <p class="lead">@HomeControllerLocalizer["Your modern solution for collaborative inventory management."]</p>
 </div>
 
 <div class="row">
     <!-- Left Column: Inventories -->
     <div class="col-md-8">
-        <h4>Latest Inventories</h4>
+        <h4>@HomeControllerLocalizer["Latest Inventories"]</h4>
         <div class="list-group mb-4">
             @foreach (var inventory in Model.LatestInventories)
             {
@@ -22,7 +25,7 @@
             }
         </div>
 
-        <h4>Most Popular Inventories</h4>
+        <h4>@HomeControllerLocalizer["Most Popular Inventories"]</h4>
         <div class="list-group">
             @foreach (var inventory in Model.TopInventories)
             {
@@ -36,7 +39,7 @@
 
     <!-- Right Column: Tag Cloud -->
     <div class="col-md-4">
-        <h4>Discover by Tag</h4>
+        <h4>@HomeControllerLocalizer["Discover by Tag"]</h4>
         <div class="card">
             <div class="card-body tag-cloud">
                 @foreach (var tag in Model.TagCloud)

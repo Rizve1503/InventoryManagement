@@ -27,8 +27,8 @@
                     </ul>
                     <div class="d-flex align-items-center ms-auto">
                         <form class="d-flex me-3" asp-controller="Search" asp-action="Index" method="get">
-                            <input class="form-control me-2" type="search" placeholder="Search..." name="query">
-                            <button class="btn btn-outline-success" type="submit">Search</button>
+                            <input class="form-control me-2" type="search" placeholder="@Localizer["Search"]..." name="query">
+                            <button class="btn btn-outline-success" type="submit">@Localizer["Search"]</button>
                         </form>
                         <div class="dropdown me-2">
                             <button class="btn btn-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">

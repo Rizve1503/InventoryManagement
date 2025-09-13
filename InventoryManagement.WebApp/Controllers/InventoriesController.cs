@@ -9,6 +9,10 @@ using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using CsvHelper;
+using System.IO;
+using System.Globalization;
+using System.Data;
 namespace InventoryManagement.WebApp.Controllers
 {
     [Authorize]
@@ -592,6 +596,120 @@ namespace InventoryManagement.WebApp.Controllers
             _context.Inventories.Remove(inventory);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        [Authorize] // Only authenticated users can export
+        public async Task<IActionResult> ExportAsCsv(int inventoryId)
+        {
+            var inventory = await _context.Inventories
+                .AsNoTracking()
+                .FirstOrDefaultAsync(i => i.Id == inventoryId);
+
+            if (inventory == null) return NotFound();
+
+            // Authorization: A user can export if the inventory is public or they are the creator.
+            var currentUserId = GetCurrentUserId();
+            if (!inventory.IsPublic && inventory.CreatorId != currentUserId)
+            {
+                return Forbid();
+            }
+
+            var items = await _context.Items
+                .AsNoTracking()
+                .Where(i => i.InventoryId == inventoryId)
+                .ToListAsync();
+
+            // Use a DataTable to handle the dynamic columns required for the CSV.
+            var dataTable = new DataTable();
+
+            // --- Dynamically Build Columns ---
+            // Always include the internal ID and Custom ID
+            dataTable.Columns.Add("InternalId", typeof(int));
+            dataTable.Columns.Add("CustomId", typeof(string));
+
+            // Add columns for all ENABLED custom fields
+            if (inventory.CustomString1State) dataTable.Columns.Add(inventory.CustomString1Name, typeof(string));
+            if (inventory.CustomString2State) dataTable.Columns.Add(inventory.CustomString2Name, typeof(string));
+            if (inventory.CustomString3State) dataTable.Columns.Add(inventory.CustomString3Name, typeof(string));
+            if (inventory.CustomText1State) dataTable.Columns.Add(inventory.CustomText1Name, typeof(string));
+            if (inventory.CustomText2State) dataTable.Columns.Add(inventory.CustomText2Name, typeof(string));
+            if (inventory.CustomText3State) dataTable.Columns.Add(inventory.CustomText3Name, typeof(string));
+            if (inventory.CustomNumeric1State) dataTable.Columns.Add(inventory.CustomNumeric1Name, typeof(decimal));
+            if (inventory.CustomNumeric2State) dataTable.Columns.Add(inventory.CustomNumeric2Name, typeof(decimal));
+            if (inventory.CustomNumeric3State) dataTable.Columns.Add(inventory.CustomNumeric3Name, typeof(decimal));
+            if (inventory.CustomBool1State) dataTable.Columns.Add(inventory.CustomBool1Name, typeof(bool));
+            if (inventory.CustomBool2State) dataTable.Columns.Add(inventory.CustomBool2Name, typeof(bool));
+            if (inventory.CustomBool3State) dataTable.Columns.Add(inventory.CustomBool3Name, typeof(bool));
+            if (inventory.CustomLink1State) dataTable.Columns.Add(inventory.CustomLink1Name, typeof(string));
+            if (inventory.CustomLink2State) dataTable.Columns.Add(inventory.CustomLink2Name, typeof(string));
+            if (inventory.CustomLink3State) dataTable.Columns.Add(inventory.CustomLink3Name, typeof(string));
+            if (inventory.CustomSelect1State) dataTable.Columns.Add(inventory.CustomSelect1Name, typeof(string));
+            if (inventory.CustomSelect2State) dataTable.Columns.Add(inventory.CustomSelect2Name, typeof(string));
+            if (inventory.CustomSelect3State) dataTable.Columns.Add(inventory.CustomSelect3Name, typeof(string));
+
+            dataTable.Columns.Add("CreatedAt", typeof(DateTime));
+
+            // --- Populate Rows ---
+            foreach (var item in items)
+            {
+                var row = dataTable.NewRow();
+                row["InternalId"] = item.Id;
+                row["CustomId"] = (object)item.CustomId ?? DBNull.Value;
+
+                if (inventory.CustomString1State) row[inventory.CustomString1Name] = (object)item.CustomString1Value ?? DBNull.Value;
+                if (inventory.CustomString2State) row[inventory.CustomString2Name] = (object)item.CustomString2Value ?? DBNull.Value;
+                if (inventory.CustomString3State) row[inventory.CustomString3Name] = (object)item.CustomString3Value ?? DBNull.Value;
+                if (inventory.CustomText1State) row[inventory.CustomText1Name] = (object)item.CustomText1Value ?? DBNull.Value;
+                if (inventory.CustomText2State) row[inventory.CustomText2Name] = (object)item.CustomText2Value ?? DBNull.Value;
+                if (inventory.CustomText3State) row[inventory.CustomText3Name] = (object)item.CustomText3Value ?? DBNull.Value;
+                if (inventory.CustomNumeric1State) row[inventory.CustomNumeric1Name] = (object)item.CustomNumeric1Value ?? DBNull.Value;
+                if (inventory.CustomNumeric2State) row[inventory.CustomNumeric2Name] = (object)item.CustomNumeric2Value ?? DBNull.Value;
+                if (inventory.CustomNumeric3State) row[inventory.CustomNumeric3Name] = (object)item.CustomNumeric3Value ?? DBNull.Value;
+                if (inventory.CustomBool1State) row[inventory.CustomBool1Name] = (object)item.CustomBool1Value ?? DBNull.Value;
+                if (inventory.CustomBool2State) row[inventory.CustomBool2Name] = (object)item.CustomBool2Value ?? DBNull.Value;
+                if (inventory.CustomBool3State) row[inventory.CustomBool3Name] = (object)item.CustomBool3Value ?? DBNull.Value;
+                if (inventory.CustomLink1State) row[inventory.CustomLink1Name] = (object)item.CustomLink1Value ?? DBNull.Value;
+                if (inventory.CustomLink2State) row[inventory.CustomLink2Name] = (object)item.CustomLink2Value ?? DBNull.Value;
+                if (inventory.CustomLink3State) row[inventory.CustomLink3Name] = (object)item.CustomLink3Value ?? DBNull.Value;
+                if (inventory.CustomSelect1State) row[inventory.CustomSelect1Name] = (object)item.CustomSelect1Value ?? DBNull.Value;
+                if (inventory.CustomSelect2State) row[inventory.CustomSelect2Name] = (object)item.CustomSelect2Value ?? DBNull.Value;
+                if (inventory.CustomSelect3State) row[inventory.CustomSelect3Name] = (object)item.CustomSelect3Value ?? DBNull.Value;
+
+                row["CreatedAt"] = item.CreatedAt;
+                dataTable.Rows.Add(row);
+            }
+
+            // --- Generate CSV File in Memory ---
+            var stream = new MemoryStream();
+            using (var writer = new StreamWriter(stream, leaveOpen: true))
+            {
+                using (var csv = new CsvWriter(writer, CultureInfo.InvariantCulture))
+                {
+                    // Write the header row
+                    foreach (DataColumn column in dataTable.Columns)
+                    {
+                        csv.WriteField(column.ColumnName);
+                    }
+                    csv.NextRecord();
+
+                    // Write the data rows
+                    foreach (DataRow dataRow in dataTable.Rows)
+                    {
+                        for (var i = 0; i < dataTable.Columns.Count; i++)
+                        {
+                            csv.WriteField(dataRow[i]);
+                        }
+                        csv.NextRecord();
+                    }
+                }
+            }
+            stream.Position = 0; // Reset the stream position to the beginning
+
+            // Create a user-friendly file name
+            var fileName = $"{inventory.Title.Replace(" ", "_")}_Export_{DateTime.UtcNow:yyyyMMdd}.csv";
+
+            // Return the stream as a downloadable file
+            return File(stream, "text/csv", fileName);
         }
     }
 }

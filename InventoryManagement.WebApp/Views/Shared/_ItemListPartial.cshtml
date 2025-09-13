@@ -1,4 +1,6 @@
 ﻿@model List<Item>
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 @{
     var inventory = ViewBag.Inventory as Inventory;
@@ -11,7 +13,7 @@
 @if (isAuthorizedUser)
 {
     <div class="d-flex justify-content-end mb-3">
-        <a asp-controller="Items" asp-action="Create" asp-route-inventoryId="@inventory.Id" class="btn btn-success">Add New Item</a>
+        <a asp-controller="Items" asp-action="Create" asp-route-inventoryId="@inventory.Id" class="btn btn-success">@Localizer["Add New Item"]</a>
     </div>
 }
 
@@ -96,8 +98,8 @@
                 <th>@inventory.CustomSelect3Name</th>
             }
 
-            <th>Created</th>
-            <th>Actions</th>
+            <th>@Localizer["Created"]</th>
+            <th>@Localizer["Actions"]</th>
         </tr>
     </thead>
     <tbody>
@@ -107,11 +109,11 @@
                 <td colspan="100%" class="text-center text-muted">
                     @if (isAuthorizedUser)
                     {
-                        <span>No items have been added yet. Why not <a asp-controller="Items" asp-action="Create" asp-route-inventoryId="@inventory.Id">add one</a>?</span>
+                        <span>@Localizer["No items have been added yet. Why not"] <a asp-controller="Items" asp-action="Create" asp-route-inventoryId="@inventory.Id">@Localizer["add one"]</a>?</span>
                     }
                     else
                     {
-                        <span>No items have been added to this inventory yet.</span>
+                        <span>@Localizer["No items have been added to this inventory yet."]</span>
                     }
                 </td>
             </tr>
@@ -175,15 +177,15 @@
 
                     @if (inventory.CustomLink1State)
                     {
-                        <td><a href="@item.CustomLink1Value" target="_blank">Link</a></td>
+                        <td><a href="@item.CustomLink1Value" target="_blank">@Localizer["Link"]</a></td>
                     }
                     @if (inventory.CustomLink2State)
                     {
-                        <td><a href="@item.CustomLink2Value" target="_blank">Link</a></td>
+                        <td><a href="@item.CustomLink2Value" target="_blank">@Localizer["Link"]</a></td>
                     }
                     @if (inventory.CustomLink3State)
                     {
-                        <td><a href="@item.CustomLink3Value" target="_blank">Link</a></td>
+                        <td><a href="@item.CustomLink3Value" target="_blank">@Localizer["Link"]</a></td>
                     }
 
                     @if (inventory.CustomSelect1State)
@@ -206,7 +208,7 @@
                             var buttonClass = userHasLiked ? "btn-primary" : "btn-outline-primary";
                         }
                         <button class="btn btn-sm @buttonClass like-btn" data-item-id="@item.Id" @(User.Identity.IsAuthenticated ? "" : "disabled") title="You must be logged in to like items">
-                            <i class="bi bi-hand-thumbs-up"></i> Like <span class="badge bg-light text-dark like-count">@item.Likes.Count</span>
+                            <i class="bi bi-hand-thumbs-up"></i>@Localizer[" Like "]<span class="badge bg-light text-dark like-count">@item.Likes.Count</span>
                         </button>
                     </td>
                 </tr>

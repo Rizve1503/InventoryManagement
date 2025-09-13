@@ -1,25 +1,27 @@
 ﻿@model InventoryManagement.Domain.Entities.Inventory
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @{
     ViewData["Title"] = "Delete Inventory";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>@InventoriesLocalizer["Delete Inventory"]</h1>
 
 <h3 class="text-danger">Are you sure you want to delete this?</h3>
 <div>
     <h4>@Model.Title</h4>
     <hr />
     <dl class="row">
-        <dt class="col-sm-2">Description</dt>
+        <dt class="col-sm-2">@InventoriesLocalizer["Description"]</dt>
         <dd class="col-sm-10">@Model.Description</dd>
-        <dt class="col-sm-2">Created By</dt>
+        <dt class="col-sm-2">@InventoriesLocalizer["Created By"]</dt>
         <dd class="col-sm-10">@Model.Creator?.Name</dd>
     </dl>
 
     <form asp-action="Delete">
         <input type="hidden" asp-for="Id" />
         <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Back to List</a>
+        <a asp-action="Index">@InventoriesLocalizer["Back to List"]</a>
     </form>
 </div>

@@ -1,4 +1,6 @@
 ﻿@model CustomIdViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @{
     ViewData["Title"] = "Custom ID Format";
@@ -11,8 +13,10 @@
     </ol>
 </nav>
 
-<h1>@ViewData["Title"] for "@Model.InventoryTitle"</h1>
-<p class="text-muted">Drag elements from the Toolbox to the Editor to build your ID format. Reorder them as needed.</p>
+<h1>
+    @InventoriesLocalizer["Custom ID Format for"] "@Model.InventoryTitle"
+</h1>
+<p class="text-muted">@InventoriesLocalizer["Drag elements from the Toolbox to the Editor to build your ID format. Reorder them as needed."]</p>
 
 @if (TempData["SuccessMessage"] != null)
 {
@@ -26,12 +30,12 @@
     <div class="col-md-3">
         <h5>Toolbox</h5>
         <div id="toolbox" class="list-group id-element-list">
-            <div class="list-group-item toolbox-item" data-type="FixedText"><i class="bi bi-fonts"></i> Fixed Text</div>
-            <div class="list-group-item toolbox-item" data-type="Sequence"><i class="bi bi-123"></i> Sequence</div>
-            <div class="list-group-item toolbox-item" data-type="RandomString"><i class="bi bi-shuffle"></i> Random String</div>
-            <div class="list-group-item toolbox-item" data-type="DateTime"><i class="bi bi-calendar-event"></i> Date/Time</div>
+            <div class="list-group-item toolbox-item" data-type="FixedText"><i class="bi bi-fonts"></i> @InventoriesLocalizer["Fixed Text"]</div>
+                <div class="list-group-item toolbox-item" data-type="Sequence"><i class="bi bi-123"></i> @InventoriesLocalizer["Sequence"]</div>
+                    <div class="list-group-item toolbox-item" data-type="RandomString"><i class="bi bi-shuffle"></i> @InventoriesLocalizer["Random String"]</div>
+                        <div class="list-group-item toolbox-item" data-type="DateTime"><i class="bi bi-calendar-event"></i> @InventoriesLocalizer["Date/Time"]</div>
         </div>
-        <small class="form-text text-muted mt-2 d-block">Drag an element to the right.</small>
+                        <small class="form-text text-muted mt-2 d-block">@InventoriesLocalizer["Drag an element to the right."]</small>
     </div>
 
     <!-- Right Column: Editor and Preview -->
@@ -49,13 +53,13 @@
             <h5 class="mt-4">Live Preview</h5>
             <div class="card">
                 <div class="card-body">
-                    <code id="preview-box" class="fs-4">Example: ...</code>
+                                    <code id="preview-box" class="fs-4">@InventoriesLocalizer["Example:"] ...</code>
                 </div>
             </div>
 
             <div class="form-group mt-4">
                 <button type="submit" class="btn btn-primary">Save Format</button>
-                <a asp-controller="Inventories" asp-action="Index" class="btn btn-secondary">Back to Inventories</a>
+                                <a asp-controller="Inventories" asp-action="Index" class="btn btn-secondary">@InventoriesLocalizer["Back to Inventories"]</a>
             </div>
         </form>
     </div>

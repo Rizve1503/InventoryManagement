@@ -117,28 +117,46 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Admin Panel" xml:space="preserve">
-    <value>Panel de Administración</value>
+  <data name="Access Denied" xml:space="preserve">
+    <value>Acceso Denegado</value>
   </data>
-  <data name="Hello" xml:space="preserve">
-    <value>Hola</value>
+  <data name="Already have an account?" xml:space="preserve">
+    <value>¿Ya tienes una cuenta?</value>
   </data>
-  <data name="Home" xml:space="preserve">
-    <value>Inicio</value>
+  <data name="Confirm password" xml:space="preserve">
+    <value>Confirmar contraseña</value>
   </data>
-  <data name="Login" xml:space="preserve">
+  <data name="Create Account" xml:space="preserve">
+    <value>Crear Cuenta</value>
+  </data>
+  <data name="Create one" xml:space="preserve">
+    <value>Crear una</value>
+  </data>
+  <data name="Don't have an account?" xml:space="preserve">
+    <value>¿No tienes una cuenta?</value>
+  </data>
+  <data name="Email" xml:space="preserve">
+    <value>Correo Electrónico</value>
+  </data>
+  <data name="Go to Home Page" xml:space="preserve">
+    <value>Ir a la Página de Inicio</value>
+  </data>
+  <data name="Name" xml:space="preserve">
+    <value>Nombre</value>
+  </data>
+  <data name="or register with" xml:space="preserve">
+    <value>o regístrate con</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Contraseña</value>
+  </data>
+  <data name="Remember me?" xml:space="preserve">
+    <value>¿Recordarme?</value>
+  </data>
+  <data name="Sign In" xml:space="preserve">
     <value>Iniciar Sesión</value>
   </data>
-  <data name="Logout" xml:space="preserve">
-    <value>Cerrar Sesión</value>
-  </data>
-  <data name="My Inventories" xml:space="preserve">
-    <value>Mis Inventarios</value>
-  </data>
-  <data name="Register" xml:space="preserve">
-    <value>Registrarse</value>
-  </data>
-  <data name="Search" xml:space="preserve">
-    <value>Buscar</value>
+  <data name="You do not have permission to view this resource." xml:space="preserve">
+    <value>No tienes permiso para ver este recurso.</value>
   </data>
 </root>

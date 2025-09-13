@@ -1,0 +1,315 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="Actions" xml:space="preserve">
+    <value>Acciones</value>
+  </data>
+  <data name="Add New Item" xml:space="preserve">
+    <value>Añadir Nuevo Artículo</value>
+  </data>
+  <data name="Back to Inventories" xml:space="preserve">
+    <value>Volver a Inventarios</value>
+  </data>
+  <data name="Back to List" xml:space="preserve">
+    <value>Volver a la Lista</value>
+  </data>
+  <data name="Cancel" xml:space="preserve">
+    <value>Cancelar</value>
+  </data>
+  <data name="Checkbox (Yes/No)" xml:space="preserve">
+    <value>Casilla (Sí/No)</value>
+  </data>
+  <data name="Create Inventory" xml:space="preserve">
+    <value>Crear inventario</value>
+  </data>
+  <data name="Create New Inventory" xml:space="preserve">
+    <value>Crear Nuevo Inventario</value>
+  </data>
+  <data name="Created" xml:space="preserve">
+    <value>Creado</value>
+  </data>
+  <data name="Created by:" xml:space="preserve">
+    <value>Creado por:</value>
+  </data>
+  <data name="Created on" xml:space="preserve">
+    <value>Creado el</value>
+  </data>
+  <data name="Custom Fields for" xml:space="preserve">
+    <value>Campos Personalizados para</value>
+  </data>
+  <data name="Custom ID" xml:space="preserve">
+    <value>ID personalizado</value>
+  </data>
+  <data name="Custom ID Format" xml:space="preserve">
+    <value>Formato de identificación personalizado</value>
+  </data>
+  <data name="Custom ID Format for" xml:space="preserve">
+    <value>Formato de ID Personalizado para</value>
+  </data>
+  <data name="Date/Time" xml:space="preserve">
+    <value>Fecha/Hora</value>
+  </data>
+  <data name="Define the data fields for items in this inventory. Enable a field, give it a name, and set any optional validation rules." xml:space="preserve">
+    <value>Defina los campos de datos de los artículos de este inventario. Habilite un campo, asígnele un nombre y configure las reglas de validación opcionales.</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Eliminar</value>
+  </data>
+  <data name="Delete Inventory" xml:space="preserve">
+    <value>Eliminar inventario</value>
+  </data>
+  <data name="Description" xml:space="preserve">
+    <value>Descripción</value>
+  </data>
+  <data name="Discussion" xml:space="preserve">
+    <value>Discusión</value>
+  </data>
+  <data name="Document/Image Link" xml:space="preserve">
+    <value>Enlace de Documento/Imagen</value>
+  </data>
+  <data name="Drag an element to the right." xml:space="preserve">
+    <value>Arrastre un elemento hacia la derecha.</value>
+  </data>
+  <data name="Drag elements from the Toolbox to the Editor to build your ID format. Reorder them as needed." xml:space="preserve">
+    <value>Arrastre elementos desde la Caja de Herramientas al Editor para crear su formato de ID. Reordene los elementos según sea necesario.</value>
+  </data>
+  <data name="Edit Inventory" xml:space="preserve">
+    <value>Editar Inventario</value>
+  </data>
+  <data name="Editor" xml:space="preserve">
+    <value>Editor</value>
+  </data>
+  <data name="Enable Field" xml:space="preserve">
+    <value>Habilitar campo</value>
+  </data>
+  <data name="Example:" xml:space="preserve">
+    <value>Ejemplo:</value>
+  </data>
+  <data name="Export" xml:space="preserve">
+    <value>Exportar</value>
+  </data>
+  <data name="Export all items and their custom field data from this inventory into a CSV file, which can be opened in Excel or other spreadsheet software." xml:space="preserve">
+    <value>Exportar todos los artículos y sus datos de campos personalizados de este inventario a un archivo CSV, que se puede abrir en Excel u otro programa de hojas de cálculo.</value>
+  </data>
+  <data name="Export Inventory Data" xml:space="preserve">
+    <value>Exportar datos de inventario</value>
+  </data>
+  <data name="Export to CSV" xml:space="preserve">
+    <value>Exportar a CSV</value>
+  </data>
+  <data name="Fields" xml:space="preserve">
+    <value>Campos</value>
+  </data>
+  <data name="Fixed Text" xml:space="preserve">
+    <value>Texto fijo</value>
+  </data>
+  <data name="Inventory Image" xml:space="preserve">
+    <value>Imagen del Inventario</value>
+  </data>
+  <data name="Items" xml:space="preserve">
+    <value>Artículos</value>
+  </data>
+  <data name="Leave a comment" xml:space="preserve">
+    <value>Dejar un comentario</value>
+  </data>
+  <data name="Live Preview" xml:space="preserve">
+    <value>Vista Previa</value>
+  </data>
+  <data name="Loading" xml:space="preserve">
+    <value>Cargando</value>
+  </data>
+  <data name="Make Public?" xml:space="preserve">
+    <value>¿Hacer Público?</value>
+  </data>
+  <data name="Multi-Line Text" xml:space="preserve">
+    <value>Texto Multilínea</value>
+  </data>
+  <data name="My Inventories" xml:space="preserve">
+    <value>Mis Inventarios</value>
+  </data>
+  <data name="Numeric" xml:space="preserve">
+    <value>Numérico</value>
+  </data>
+  <data name="Post Comment" xml:space="preserve">
+    <value>Publicar comentario</value>
+  </data>
+  <data name="Private" xml:space="preserve">
+    <value>privado</value>
+  </data>
+  <data name="Public" xml:space="preserve">
+    <value>público</value>
+  </data>
+  <data name="Random String" xml:space="preserve">
+    <value>Cadena aleatoria</value>
+  </data>
+  <data name="Save" xml:space="preserve">
+    <value>Guardar</value>
+  </data>
+  <data name="Save Fields" xml:space="preserve">
+    <value>Guardar Campos</value>
+  </data>
+  <data name="Save Format" xml:space="preserve">
+    <value>Guardar Formato</value>
+  </data>
+  <data name="Select" xml:space="preserve">
+    <value>Selecto</value>
+  </data>
+  <data name="Select from List" xml:space="preserve">
+    <value>Seleccionar de la Lista</value>
+  </data>
+  <data name="Sequence" xml:space="preserve">
+    <value>Secuencia</value>
+  </data>
+  <data name="Settings" xml:space="preserve">
+    <value>Ajustes</value>
+  </data>
+  <data name="Sign in" xml:space="preserve">
+    <value>Iniciar sesión</value>
+  </data>
+  <data name="Single-Line Text" xml:space="preserve">
+    <value>Texto de una Línea</value>
+  </data>
+  <data name="Stats" xml:space="preserve">
+    <value>Estadísticas</value>
+  </data>
+  <data name="Status" xml:space="preserve">
+    <value>Estado</value>
+  </data>
+  <data name="Tags (comma-separated)" xml:space="preserve">
+    <value>Etiquetas (separadas por comas)</value>
+  </data>
+  <data name="Title" xml:space="preserve">
+    <value>Título</value>
+  </data>
+  <data name="Title &amp; Description" xml:space="preserve">
+    <value>Título y Descripción</value>
+  </data>
+  <data name="to post a comment." xml:space="preserve">
+    <value>para publicar un comentario.</value>
+  </data>
+  <data name="Toolbox" xml:space="preserve">
+    <value>Caja de Herramientas</value>
+  </data>
+  <data name="View" xml:space="preserve">
+    <value>Vista</value>
+  </data>
+  <data name="You haven't created any inventories yet." xml:space="preserve">
+    <value>Aún no has creado ningún inventario.</value>
+  </data>
+</root>

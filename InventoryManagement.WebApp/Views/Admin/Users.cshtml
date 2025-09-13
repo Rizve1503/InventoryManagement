@@ -1,12 +1,14 @@
 ﻿@model UserListViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.AdminController> Localizer
 
 @{
-    ViewData["Title"] = "User Management";
+    ViewData["Title"] = Localizer["User Management"];
     var currentUserId = int.Parse(User.FindFirstValue(System.Security.Claims.ClaimTypes.NameIdentifier));
 }
 
-<h1>@ViewData["Title"]</h1>
-<p>Manage user accounts, roles, and access.</p>
+<h1>@Localizer["User Management"]</h1>
+<p>@Localizer["Manage user accounts, roles, and access."]</p>
 
 @if (TempData["ErrorMessage"] != null)
 {
@@ -16,11 +18,11 @@
 <table class="table table-striped table-bordered">
     <thead class="thead-light">
         <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Role</th>
-            <th>Status</th>
-            <th>Actions</th>
+            <th>@Localizer["Name"]</th>
+            <th>@Localizer["Email"]</th>
+            <th>@Localizer["Role"]</th>
+            <th>@Localizer["Status"]</th>
+            <th>@Localizer["Actions"]</th>
         </tr>
     </thead>
     <tbody>
@@ -33,11 +35,11 @@
                 <td>
                     @if (user.IsBlocked)
                     {
-                        <span class="badge bg-danger">Blocked</span>
+                        <span class="badge bg-danger">@Localizer["Blocked"]</span>
                     }
                     else
                     {
-                        <span class="badge bg-success">Active</span>
+                        <span class="badge bg-success">@Localizer["Active"]</span>
                     }
                 </td>
                 <td>
@@ -45,14 +47,14 @@
                         <form asp-action="ToggleBlockUser" method="post" class="me-1">
                             <input type="hidden" name="userId" value="@user.Id" />
                             <button type="submit" class="btn btn-sm @(user.IsBlocked ? "btn-success" : "btn-warning")">
-                                @(user.IsBlocked ? "Unblock" : "Block")
+                                @(user.IsBlocked? Localizer["Unblock"] : Localizer["Block"])
                             </button>
                         </form>
 
                         <form asp-action="ToggleAdminRole" method="post" class="me-1">
                             <input type="hidden" name="userId" value="@user.Id" />
                             <button type="submit" class="btn btn-sm btn-info">
-                                @(user.RoleName == "Admin" ? "Remove Admin" : "Make Admin")
+                                @(user.RoleName == "Admin" ? Localizer["Remove Admin"] : Localizer["Make Admin"])
                             </button>
                         </form>
 
@@ -60,8 +62,8 @@
                             <input type="hidden" name="userId" value="@user.Id" />
                             <button type="submit" class="btn btn-sm btn-danger"
                                     @(user.Id == currentUserId ? "disabled" : "")
-                                    onclick="return confirm('Are you sure you want to delete this user? This cannot be undone.');">
-                                Delete
+                                    onclick="return confirm('@Localizer["Are you sure you want to delete this user? This cannot be undone."]');">
+                                @Localizer["Delete"]
                             </button>
                         </form>
                     </div>

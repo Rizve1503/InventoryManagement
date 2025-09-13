@@ -117,28 +117,31 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Admin Panel" xml:space="preserve">
-    <value>Panel de Administración</value>
+  <data name="Average" xml:space="preserve">
+    <value>Promedio</value>
   </data>
-  <data name="Hello" xml:space="preserve">
-    <value>Hola</value>
+  <data name="Count" xml:space="preserve">
+    <value>Contar</value>
   </data>
-  <data name="Home" xml:space="preserve">
-    <value>Inicio</value>
+  <data name="Field Name" xml:space="preserve">
+    <value>Nombre del campo</value>
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Iniciar Sesión</value>
+  <data name="Maximum" xml:space="preserve">
+    <value>Máximo</value>
   </data>
-  <data name="Logout" xml:space="preserve">
-    <value>Cerrar Sesión</value>
+  <data name="Minimum" xml:space="preserve">
+    <value>Mínimo</value>
   </data>
-  <data name="My Inventories" xml:space="preserve">
-    <value>Mis Inventarios</value>
+  <data name="Most Frequent Value" xml:space="preserve">
+    <value>Valor más frecuente</value>
   </data>
-  <data name="Register" xml:space="preserve">
-    <value>Registrarse</value>
+  <data name="No statistics to display. This inventory may not have any items or configured numeric/string fields." xml:space="preserve">
+    <value>No hay estadísticas para mostrar. Es posible que este inventario no contenga artículos ni campos numéricos/de cadena configurados.</value>
   </data>
-  <data name="Search" xml:space="preserve">
-    <value>Buscar</value>
+  <data name="String Field Statistics" xml:space="preserve">
+    <value>Estadísticas de campos de cadena</value>
+  </data>
+  <data name="Total Items in Inventory:" xml:space="preserve">
+    <value>Total de artículos en inventario:</value>
   </data>
 </root>

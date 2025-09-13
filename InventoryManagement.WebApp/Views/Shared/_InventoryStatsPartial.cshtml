@@ -1,9 +1,11 @@
 ﻿@model InventoryStatsViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IViewLocalizer Localizer
 
 <div class="row">
     <div class="col-md-12">
         <h4>Overall</h4>
-        <p><strong>Total Items in Inventory:</strong> @Model.TotalItems</p>
+        <p><strong>@Localizer["Total Items in Inventory:</strong> @Model.TotalItems"]</p>
     </div>
 </div>
 <hr />
@@ -12,14 +14,14 @@
 {
     <div class="row mt-3">
         <div class="col-md-12">
-            <h4>Numeric Field Statistics</h4>
+            <h4>@Localizer["Numeric Field Statistics"]</h4>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Field Name</th>
-                        <th>Average</th>
-                        <th>Minimum</th>
-                        <th>Maximum</th>
+                        <th>@Localizer["Field Name"]</th>
+                        <th>@Localizer["Average"]</th>
+                        <th>@Localizer["Minimum"]</th>
+                        <th>@Localizer["Maximum"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -43,13 +45,13 @@
 {
     <div class="row mt-3">
         <div class="col-md-12">
-            <h4>String Field Statistics</h4>
+            <h4>@Localizer["String Field Statistics"]</h4>
             <table class="table">
                 <thead>
                     <tr>
-                        <th>Field Name</th>
-                        <th>Most Frequent Value</th>
-                        <th>Count</th>
+                            <th>@Localizer["Field Name"]</th>
+                            <th>@Localizer["Most Frequent Value"]</th>
+                            <th>@Localizer["Count"]</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -69,5 +71,5 @@
 
 @if (!Model.NumericStats.Any() && !Model.StringStats.Any())
 {
-    <p class="text-muted mt-3">No statistics to display. This inventory may not have any items or configured numeric/string fields.</p>
+    <p class="text-muted mt-3">@Localizer["No statistics to display. This inventory may not have any items or configured numeric/string fields."]</p>
 }

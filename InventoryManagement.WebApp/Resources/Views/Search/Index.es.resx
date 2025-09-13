@@ -117,28 +117,16 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Admin Panel" xml:space="preserve">
-    <value>Panel de Administración</value>
+  <data name="An item's content matched your search. Click to view the full inventory" xml:space="preserve">
+    <value>El contenido de un artículo coincidió con tu búsqueda. Haz clic para ver el inventario completo.</value>
   </data>
-  <data name="Hello" xml:space="preserve">
-    <value>Hola</value>
+  <data name="Found in Inventories" xml:space="preserve">
+    <value>Encontrado en inventarios</value>
   </data>
-  <data name="Home" xml:space="preserve">
-    <value>Inicio</value>
+  <data name="Found in Items" xml:space="preserve">
+    <value>Encontrado en Artículos</value>
   </data>
-  <data name="Login" xml:space="preserve">
-    <value>Iniciar Sesión</value>
-  </data>
-  <data name="Logout" xml:space="preserve">
-    <value>Cerrar Sesión</value>
-  </data>
-  <data name="My Inventories" xml:space="preserve">
-    <value>Mis Inventarios</value>
-  </data>
-  <data name="Register" xml:space="preserve">
-    <value>Registrarse</value>
-  </data>
-  <data name="Search" xml:space="preserve">
-    <value>Buscar</value>
+  <data name="No results found." xml:space="preserve">
+    <value>No se encontraron resultados.</value>
   </data>
 </root>

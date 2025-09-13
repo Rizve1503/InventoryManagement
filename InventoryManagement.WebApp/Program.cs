@@ -33,6 +33,21 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.AccessDeniedPath = "/Account/AccessDenied";
         options.ExpireTimeSpan = TimeSpan.FromDays(7);
         options.SlidingExpiration = true;
+    })
+    // --- THE FOLLOWING .AddGoogle() AND .AddGitHub() blocks ---
+    .AddGoogle(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:Google:ClientId"]
+            ?? throw new InvalidOperationException("Google ClientId not configured.");
+        options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"]
+            ?? throw new InvalidOperationException("Google ClientSecret not configured.");
+    })
+    .AddGitHub(options =>
+    {
+        options.ClientId = builder.Configuration["Authentication:GitHub:ClientId"]
+            ?? throw new InvalidOperationException("GitHub ClientId not configured.");
+        options.ClientSecret = builder.Configuration["Authentication:GitHub:ClientSecret"]
+            ?? throw new InvalidOperationException("GitHub ClientSecret not configured.");
     });
 
 

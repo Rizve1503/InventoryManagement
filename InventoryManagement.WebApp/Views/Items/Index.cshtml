@@ -1,5 +1,7 @@
 ﻿@using InventoryManagement.WebApp.ViewModels
 @model ItemIndexViewModel
+@using Microsoft.AspNetCore.Mvc.Localization
+@inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @{
     ViewData["Title"] = $"Items in {Model.Inventory.Title}";
@@ -7,14 +9,14 @@
 
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a asp-controller="Inventories" asp-action="Index">My Inventories</a></li>
+        <li class="breadcrumb-item"><a asp-controller="Inventories" asp-action="Index">@InventoriesLocalizer["My Inventories"]</a></li>
         <li class="breadcrumb-item active" aria-current="page">@Model.Inventory.Title</li>
     </ol>
 </nav>
 
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>@ViewData["Title"]</h1>
-    <a asp-action="Create" asp-route-inventoryId="@Model.Inventory.Id" class="btn btn-primary">Add New Item</a>
+    <a asp-action="Create" asp-route-inventoryId="@Model.Inventory.Id" class="btn btn-primary">@InventoriesLocalizer["Add New Item"]</a>
 </div>
 
 <table class="table table-bordered table-striped">

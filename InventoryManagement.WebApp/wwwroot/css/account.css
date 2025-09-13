@@ -12,18 +12,16 @@
     width: 100%;
 }
 
-/* === Left Branding Panel === */
+/* === Left Branding Panel (Your Original Design) === */
 .branding-panel {
     width: 45%;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
-    /* Apply the background image */
     background-image: url('../images/background.jpg');
     background-size: cover;
     background-position: center;
-    /* Create the diagonal cut effect */
     clip-path: polygon(0 0, 100% 0, 85% 100%, 0% 100%);
 }
 
@@ -37,8 +35,7 @@
     height: auto;
 }
 
-
-/* === Right Form Panel === */
+/* === Right Form Panel (Your Original Design) === */
 .form-panel {
     width: 55%;
     display: flex;
@@ -64,8 +61,7 @@
         text-align: center;
     }
 
-
-/* === Form Styles === */
+/* === Form Styles (Your Original Design) === */
 .form-group {
     margin-bottom: 1.5rem;
 }
@@ -119,8 +115,64 @@
             text-decoration: underline;
         }
 
+/* Social Login Divider */
+.social-login-divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: #6c757d;
+    margin: 1.5rem 0;
+}
 
-/* === RESPONSIVENESS === */
+    .social-login-divider::before,
+    .social-login-divider::after {
+        content: '';
+        flex: 1;
+        border-bottom: 1px solid #dee2e6;
+    }
+
+    .social-login-divider:not(:empty)::before {
+        margin-right: .5em;
+    }
+
+    .social-login-divider:not(:empty)::after {
+        margin-left: .5em;
+    }
+
+/* Container for the social buttons */
+.social-login-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+}
+
+/* The new button style for the logos */
+.social-login-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    flex: 1;
+    height: 48px;
+    background-color: #ffffff;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    transition: all 0.2s ease-in-out;
+}
+
+    .social-login-btn:hover {
+        background-color: #f8f9fa;
+        border-color: #adb5bd;
+    }
+
+    /* Rule for sizing the logos inside the buttons */
+    .social-login-btn img {
+        max-height: 24px;
+        width: auto;
+        object-fit: contain;
+    }
+
+/* === RESPONSIVENESS (Your Original Design) === */
 @media (max-width: 992px) {
     .account-container {
         flex-direction: column;
@@ -129,8 +181,7 @@
     .branding-panel {
         width: 100%;
         min-height: 250px;
-        /* Remove the diagonal cut on smaller screens for a clean, stacked look */
-        clip-path: none;
+        clip-path: none; /* Remove diagonal cut on smaller screens */
     }
 
     .form-panel {
