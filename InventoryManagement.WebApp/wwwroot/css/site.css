@@ -1,26 +1,28 @@
+/* Base Styles */
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
+/* Dark Theme Overrides */
 [data-bs-theme="dark"] .navbar {
     background-color: #212529 !important; /* Dark background for navbar */
 }
@@ -34,4 +36,47 @@ body {
     [data-bs-theme="dark"] .nav-link:hover,
     [data-bs-theme="dark"] .navbar-brand:hover {
         color: #ffffff !important;
+    }
+
+
+/* Reusable class for a modern, high-contrast primary button */
+.btn-custom-primary {
+    background-color: #2c3e50; /* A dark, professional blue/grey */
+    color: #ffffff;
+    border: 1px solid #2c3e50;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+    .btn-custom-primary:hover {
+        background-color: #34495e; /* A slightly lighter shade on hover */
+        color: #ffffff;
+        border-color: #34495e;
+    }
+
+/* Update theme/language buttons to use this style */
+#theme-toggle-btn, .language-btn {
+    background-color: #2c3e50;
+    color: #ffffff;
+    border: 1px solid #2c3e50;
+    font-weight: 500;
+    transition: all 0.2s ease-in-out;
+}
+
+    #theme-toggle-btn:hover, .language-btn:hover {
+        background-color: #34495e;
+        color: #ffffff;
+        border-color: #34495e;
+    }
+
+/* Style for the action dropdowns in tables/cards */
+.actions-dropdown .dropdown-toggle {
+    background-color: #34495e; /* A neutral, professional dark grey/blue */
+    border-color: #34495e;
+    color: #ffffff;
+}
+
+    .actions-dropdown .dropdown-toggle:hover {
+        background-color: #2c3e50; /* A slightly darker shade on hover */
+        border-color: #2c3e50;
     }

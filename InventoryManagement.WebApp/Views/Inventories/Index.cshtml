@@ -3,7 +3,7 @@
 @inject IHtmlLocalizer<InventoryManagement.WebApp.Controllers.InventoriesController> InventoriesLocalizer
 
 @{
-    ViewData["Title"] = "My Inventories";
+    ViewData["Title"] = InventoriesLocalizer["My Inventories"];
     var viewType = ViewBag.ViewType as string ?? "list";
 }
 

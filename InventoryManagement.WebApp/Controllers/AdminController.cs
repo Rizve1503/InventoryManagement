@@ -79,17 +79,39 @@ namespace InventoryManagement.WebApp.Controllers
             var currentUserId = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
             if (userId == currentUserId)
             {
-                // Prevent admin from deleting themselves
                 TempData["ErrorMessage"] = "You cannot delete your own account.";
                 return RedirectToAction(nameof(Users));
             }
 
-            var user = await _context.Users.FindAsync(userId);
-            if (user != null)
+            var userToDelete = await _context.Users
+                .Include(u => u.Inventories) // We MUST include their inventories
+                .Include(u => u.Comments)   // We MUST load the comments to delete them
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (userToDelete != null)
             {
-                _context.Users.Remove(user);
+                // 1. Remove all inventories created by the user.
+                //    The database will cascade this to delete all associated Items and their Likes.
+                if (userToDelete.Inventories.Any())
+                {
+                    _context.Inventories.RemoveRange(userToDelete.Inventories);
+                }
+
+                // 2. Remove all comments made by the user.
+                //    (The database will NOT cascade this, so we do it manually)
+                if (userToDelete.Comments.Any())
+                {
+                    _context.Comments.RemoveRange(userToDelete.Comments);
+                }
+
+                
+                // 3. Now it is safe to remove the user.
+                //    The database will cascade this to delete any remaining Likes the user made.
+                _context.Users.Remove(userToDelete);
+
                 await _context.SaveChangesAsync();
             }
+
             return RedirectToAction(nameof(Users));
         }
     }
